@@ -514,10 +514,15 @@ def actualizar_estado(request, id):
     if request.method != "POST":
         return JsonResponse({"error": "Metodo no permitido"}, status=405)
 
+    # Intentar extraer datos del body (JSON) o del POST (Form) de manera segura
     try:
-        data = json.loads(request.body or "{}")
-    except json.JSONDecodeError:
-        return JsonResponse({"error": "JSON invalido"}, status=400)
+        if request.content_type == 'application/json':
+            body_unicode = request.body.decode('utf-8')
+            data = json.loads(body_unicode) if body_unicode else {}
+        else:
+            data = request.POST.dict()
+    except Exception:
+        return JsonResponse({"error": "Error al procesar los datos enviados"}, status=400)
 
     nuevo_estado = (data.get("estado") or "").strip()
     password = (data.get("password") or "").strip()
@@ -526,12 +531,21 @@ def actualizar_estado(request, id):
     if nuevo_estado not in ["Aceptado", "Rechazado"]:
         return JsonResponse({"error": "Estado invalido"}, status=400)
 
+    # Búsqueda robusta por ID: intentamos como ObjectId y luego como string si falla
+    query = None
     try:
-        solicitud_obj_id = ObjectId(id)
+        # Intentamos convertir a ObjectId si es un hex válido de 24 caracteres
+        query = {"_id": ObjectId(id)}
     except Exception:
-        return JsonResponse({"error": "ID invalido"}, status=400)
+        # Si falla (ej. hash de 40 caracteres), buscamos por string directamente
+        query = {"_id": id}
 
-    solicitud = db.solicitudes.find_one({"_id": solicitud_obj_id})
+    solicitud = db.solicitudes.find_one(query)
+    
+    # Fallback adicional: si buscamos por ObjectId y no existe, probamos como string exacto
+    if not solicitud and isinstance(query.get("_id"), ObjectId):
+        solicitud = db.solicitudes.find_one({"_id": id})
+
     if not solicitud:
         return JsonResponse({"error": "Solicitud no encontrada"}, status=404)
 
