@@ -14,7 +14,7 @@ class MongoDB:
         try:
             self.client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
             self.client.admin.command("ping")
-            self.db = self.client["202304042_db_user"]
+            self.db = self.client["milton_usuario"]
             self.fs = gridfs.GridFS(self.db)
             print("Conexión a MongoDB exitosa")
         except ConnectionFailure as e:
