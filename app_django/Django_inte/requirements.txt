@@ -13,3 +13,4 @@ setuptools
 gunicorn==22.0.0
 whitenoise==5.3.0
 dj-database-url==0.5.0
+python-dotenv==1.0.1
