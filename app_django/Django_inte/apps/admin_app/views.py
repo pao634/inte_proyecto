@@ -7,6 +7,8 @@ import smtplib
 import tempfile
 import shutil
 import subprocess
+import threading
+import logging
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
@@ -363,8 +365,10 @@ def solicitudes_panel(request):
     return render(request, "solicitudes.html")
 
 
-def enviar_correo_estado_solicitud(destinatario, nombre, estado, password=None, motivo=None):
-    smtp_server = "smtp.gmail.com"
+logger = logging.getLogger(__name__)
+
+def enviar_correo_estado_solicitud(destinatario, nombre, estado, password=None, motivo=None, smtp_server_conn=None):
+    smtp_host = "smtp.gmail.com"
     smtp_port = 587
     sender_email = os.getenv("EMAIL_HOST_USER")
     sender_password = os.getenv("EMAIL_HOST_PASSWORD")
@@ -442,14 +446,47 @@ def enviar_correo_estado_solicitud(destinatario, nombre, estado, password=None, 
     mensaje.attach(MIMEText(html, "html"))
 
     try:
-        server = smtplib.SMTP(smtp_server, smtp_port)
+        if smtp_server_conn:
+            smtp_server_conn.send_message(mensaje)
+            return True
+        else:
+            # Añadimos timeout para evitar bloqueos infinitos
+            server = smtplib.SMTP(smtp_host, smtp_port, timeout=10)
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.send_message(mensaje)
+            server.quit()
+            return True
+    except Exception as e:
+        logger.error(f"Error enviando correo a {destinatario}: {str(e)}")
+        return False
+
+def _background_enviar_correos_bulk(destinatarios_list, estado, password=None, motivo=None):
+    """ Envia correos a múltiples destinatarios usando una sola conexión SMTP. """
+    smtp_host = "smtp.gmail.com"
+    smtp_port = 587
+    sender_email = os.getenv("EMAIL_HOST_USER")
+    sender_password = os.getenv("EMAIL_HOST_PASSWORD")
+
+    if not sender_email or not sender_password or not destinatarios_list:
+        return
+
+    try:
+        server = smtplib.SMTP(smtp_host, smtp_port, timeout=15)
         server.starttls()
         server.login(sender_email, sender_password)
-        server.send_message(mensaje)
+        for dest in destinatarios_list:
+            enviar_correo_estado_solicitud(
+                destinatario=dest.get("correo"),
+                nombre=dest.get("nombre"),
+                estado=estado,
+                password=password,
+                motivo=motivo,
+                smtp_server_conn=server
+            )
         server.quit()
-        return True
-    except Exception:
-        return False
+    except Exception as e:
+        logger.error(f"Error en bulk email background: {str(e)}")
 
 
 def enviar_correo_rechazo_contrato(destinatario, nombre, motivo):
@@ -600,6 +637,9 @@ def actualizar_estado(request, id):
             except Exception:
                 integrantes = []
 
+        # Lista para envío masivo en segundo plano
+        destinatarios_bulk = [{"correo": correo, "nombre": nombre}]
+
         for integrante in integrantes:
             i_correo = (integrante.get("correo") or "").strip().lower()
             i_nombre = (integrante.get("nombre") or "Integrante").strip()
@@ -624,29 +664,28 @@ def actualizar_estado(request, id):
             else:
                 db.usuarios.insert_one({**datos_integra, "fecha_creacion": datetime.utcnow()})
             
-            # Enviar correo al integrante
-            enviar_correo_estado_solicitud(
-                destinatario=i_correo,
-                nombre=i_nombre,
-                estado=nuevo_estado,
-                password=password
-            )
+            # Agregamos a la lista de envíos background
+            destinatarios_bulk.append({"correo": i_correo, "nombre": i_nombre})
 
         _asegurar_proyecto_activo(solicitud, usuario_lider_id)
 
-    # Enviar correo al líder (o único solicitante)
-    correo_enviado = enviar_correo_estado_solicitud(
-        destinatario=correo,
-        nombre=nombre,
-        estado=nuevo_estado,
-        password=password if nuevo_estado == "Aceptado" else None,
-        motivo=motivo
-    )
+        # Enviar correos de aceptación en segundo plano (Bulk)
+        threading.Thread(
+            target=_background_enviar_correos_bulk,
+            args=(destinatarios_bulk, nuevo_estado, password, None)
+        ).start()
+
+    else:
+        # Caso Rechazado: Enviar correo informativo en segundo plano
+        threading.Thread(
+            target=enviar_correo_estado_solicitud,
+            args=(correo, nombre, nuevo_estado, None, motivo)
+        ).start()
 
     # Elimina la solicitud del tablero (aceptada pasa a usuarios, rechazada se descarta).
     db.solicitudes.delete_one({"_id": solicitud["_id"]})
 
-    return JsonResponse({"success": True, "mail_enviado": correo_enviado})
+    return JsonResponse({"success": True, "mail_enviado": True})
 
 from django.shortcuts import render
 
