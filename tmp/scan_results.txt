@@ -1,0 +1,10 @@
+Total DBs: 4
+DB List: ['milton_user', 'sample_mflix', 'admin', 'local']
+-- DB: milton_user --
+   Cols: ['calendario_eventos', 'firmas', 'fs.files', 'roles', 'convocatorias', 'proyectos', 'contrato_vigente', 'solicitudes', 'publicaciones', 'anuncios', 'password_resets', 'documentacion_emprendedor', 'documentos_personales', 'usuarios', 'fs.chunks', 'expediente_documentos', 'chat_mensajes', 'cedula_inscripcion', 'contrato_proyecto']
+   🎯 ENCONTRADO! Collection 'usuarios' with 8 documents.
+   ✅ Usuario 202304042@utacapulco.edu.mx existe aquí!
+------------------------------
+-- DB: sample_mflix --
+   Cols: ['sessions', 'theaters', 'users', 'comments', 'movies', 'embedded_movies']
+------------------------------
