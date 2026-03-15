@@ -490,6 +490,11 @@ function selectCareer(careerName) {
 }
 
 addMemberBtn.addEventListener("click", () => {
+    const currentMembers = membersBody.querySelectorAll("tr").length;
+    if (currentMembers >= 10) {
+        showAlert("⚠️ Solo puedes agregar hasta 10 integrantes por equipo.", "warning");
+        return;
+    }
     membersBody.appendChild(createMemberRow());
 });
 
@@ -497,11 +502,18 @@ addMemberBtn.addEventListener("click", () => {
 membersBody.appendChild(createMemberRow());
 
 // ==================== Envío del formulario ====================
+let isSubmitting = false;
 form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
+    if (isSubmitting) return;
+    isSubmitting = true;
+    submitBtn.disabled = true;
+
     // Validación de campos obligatorios
     if (!form.checkValidity()) {
+        isSubmitting = false;
+        submitBtn.disabled = false;
         showAlert("❌ Por favor completa todos los campos requeridos.", "danger");
         return;
     }
@@ -513,6 +525,8 @@ form.addEventListener("submit", async function (e) {
         correoError.innerText = "El correo debe terminar en @utacapulco.edu.mx";
         correoError.style.display = "block";
         showAlert("❌ El correo del líder no es válido.", "danger");
+        isSubmitting = false;
+        submitBtn.disabled = false;
         return;
     }
 
@@ -541,10 +555,11 @@ form.addEventListener("submit", async function (e) {
 
     if (!integrantesValidos) {
         showAlert("❌ Por favor completa los datos de todos los integrantes.", "danger");
+        isSubmitting = false;
+        submitBtn.disabled = false;
         return;
     }
 
-    submitBtn.disabled = true;
     submitBtn.innerText = "Enviando...";
 
     const formData = new FormData(form);
@@ -578,6 +593,7 @@ form.addEventListener("submit", async function (e) {
     } finally {
         submitBtn.disabled = false;
         submitBtn.innerText = "Enviar Solicitud";
+        isSubmitting = false;
     }
 });
 </script>
