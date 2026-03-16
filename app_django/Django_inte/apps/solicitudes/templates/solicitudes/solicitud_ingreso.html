@@ -146,6 +146,22 @@ h5 i {
     color: white;
 }
 
+/* Alerts (forzar paleta azul en todos los estados) */
+.alert-success,
+.alert-danger,
+.alert-warning,
+.alert-info {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1e3a8a;
+}
+.alert-success .btn-close,
+.alert-danger .btn-close,
+.alert-warning .btn-close,
+.alert-info .btn-close {
+    filter: none;
+}
+
 /* Table */
 .table {
     border-radius: 12px;
@@ -252,6 +268,7 @@ h5 i {
             </div>
 
             <div class="card-body p-4">
+                <div id="alertContainer" class="mb-3"></div>
                 <form id="solicitudForm" method="POST" novalidate>
                     {% csrf_token %}
 
@@ -346,6 +363,8 @@ h5 i {
                         </button>
                     </div>
 
+                </form>
+
                 {% include "solicitudes/cedula_inscripcion.html" %}
 
                 <!-- Modal para Selección de Carrera -->
@@ -376,12 +395,49 @@ h5 i {
                   </div>
                 </div>
 
+                <!-- Modal Exito Solicitud -->
+                <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title" id="successModalLabel">
+                                    <i class="bi bi-check-circle-fill me-2"></i>Solicitud enviada con exito
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="mb-2">Tu solicitud quedo en <strong>proceso de revision</strong>.</p>
+                                <p class="mb-0">Enviamos un correo de confirmacion a: <strong id="successCorreo"></strong> (incluye tu cedula de inscripcion en PDF).</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-primary" onclick="generarPDF()">Descargar cedula ahora</button>
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Finalizar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const form = document.getElementById("solicitudForm");
 const submitBtn = document.getElementById("submitBtn");
+const alertContainer = document.getElementById("alertContainer");
+const successModalEl = document.getElementById("successModal");
+const successCorreoEl = document.getElementById("successCorreo");
+const successModal = successModalEl ? new bootstrap.Modal(successModalEl) : null;
+let shouldResetAfterSuccess = false;
+
+function showAlert(message, type = "info") {
+    if (!alertContainer) return;
+    alertContainer.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+}
 
 // ==================== Validación en tiempo real del correo ====================
 const correoInput = form.querySelector("[name='correo']");
@@ -470,6 +526,24 @@ addMemberBtn.addEventListener("click", () => {
 // Agregar uno por defecto
 membersBody.appendChild(createMemberRow());
 
+// Resetear formulario cuando el usuario cierre el modal de exito
+if (successModalEl) {
+    successModalEl.addEventListener("hidden.bs.modal", function () {
+        if (!shouldResetAfterSuccess) return;
+        shouldResetAfterSuccess = false;
+        try {
+            form.reset();
+            membersBody.innerHTML = "";
+            membersBody.appendChild(createMemberRow());
+            correoInput.classList.remove("is-invalid");
+            correoError.style.display = "none";
+            if (alertContainer) alertContainer.innerHTML = "";
+        } catch (e) {
+            console.error("Error reseteando formulario:", e);
+        }
+    });
+}
+
 // ==================== Envío del formulario ====================
 let isSubmitting = false;
 form.addEventListener("submit", async function (e) {
@@ -551,6 +625,16 @@ form.addEventListener("submit", async function (e) {
         });
 
         if (response.ok) {
+            shouldResetAfterSuccess = true;
+
+            if (successCorreoEl) {
+                successCorreoEl.textContent = (data.correo || correoInput.value || "").trim();
+            }
+
+            if (successModal) {
+                successModal.show();
+                return;
+            }
             showAlert("✅ Solicitud enviada con éxito. Revisa tu correo.", "success");
             form.reset();
             membersBody.innerHTML = "";

@@ -52,7 +52,7 @@ def enviar_correo(destinatario, datos):
 
     # Encabezado
     header_data = [
-        [Paragraph("Cedula de inscripcion", title_style), Paragraph("Estado: Recibida", ParagraphStyle(name="Badge", parent=styles["Normal"], fontSize=10, textColor=colors.white, alignment=1))],
+        [Paragraph("Cedula de inscripcion", title_style), Paragraph("Estado: En proceso", ParagraphStyle(name="Badge", parent=styles["Normal"], fontSize=10, textColor=colors.white, alignment=1))],
         [Paragraph("Solicitud de ingreso a la incubadora • Formato de evaluacion de emprendimientos", subtitle_style), ""]
     ]
     header = Table(header_data, colWidths=[360, 120])
@@ -153,7 +153,8 @@ def enviar_correo(destinatario, datos):
             <tr>
                 <td style="padding:30px;">
                     <p>Hola <strong>{datos.get('nombre_completo', '')}</strong>,</p>
-                    <p>Recibimos tu solicitud. Adjuntamos tu cedula de inscripcion en PDF para tu registro.</p>
+                    <p>Recibimos tu solicitud y ya se encuentra <strong>en proceso de revision</strong>.</p>
+                    <p>Adjuntamos tu cedula de inscripcion en PDF para tu registro.</p>
                     <p style="background:#fbbf24; color:#111827; padding:10px; border-radius:8px; text-align:center; font-weight:bold;">
                         Documento adjunto disponible
                     </p>
@@ -165,7 +166,7 @@ def enviar_correo(destinatario, datos):
     """
 
     mensaje = EmailMultiAlternatives(
-        subject="🚀 Confirmacion de solicitud a la incubadora",
+        subject="Confirmacion de solicitud - Incubadora de Empresas",
         body="Recibimos tu solicitud. Revisa el documento adjunto.",
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=[destinatario]
