@@ -3,7 +3,6 @@ from django.http import JsonResponse
 from datetime import datetime
 import json 
 from config.database.mongo import db 
-from apps.utils.email_service import enviar_correo
 
 def solicitud_ingreso_view(request):
     if request.method == "POST":
@@ -25,9 +24,10 @@ def solicitud_ingreso_view(request):
             # 1. Guardar en MongoDB
             db.solicitudes.insert_one(data)
 
-            # 2. Enviar Correo (dentro de un try para que si falla el correo, no falle el registro)
+            # 2. Enviar Correo (Asíncrono para no bloquear)
             try:
-                enviar_correo(data["correo"], data)
+                from apps.utils.email_service import enviar_correo_async
+                enviar_correo_async(data["correo"], data)
             except Exception as mail_error:
                 print(f"Error al enviar correo: {mail_error}")
 

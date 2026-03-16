@@ -4,13 +4,13 @@ import gridfs
 from io import BytesIO
 from datetime import datetime
 from dotenv import load_dotenv
-from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure
-
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
+import threading
+
+from config.database.mongo import db
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -20,27 +20,8 @@ from reportlab.lib import colors
 load_dotenv()
 
 # ==========================================================
-#  Conexion a MongoDB + GridFS
+#  Utilidades de Email
 # ==========================================================
-
-MONGO_URI = os.getenv("MONGO_URI")
-
-
-class MongoDB:
-    def __init__(self):
-        try:
-            self.client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
-            self.client.admin.command("ping")
-            self.db = self.client["milton_user"]
-            self.fs = gridfs.GridFS(self.db)
-            print("Conexion a MongoDB exitosa")
-        except ConnectionFailure as e:
-            print("Error de conexion a MongoDB")
-            raise e
-
-
-mongo_instance = MongoDB()
-db = mongo_instance.db
 
 
 # ==========================================================
@@ -371,7 +352,7 @@ def enviar_correo(destinatario, datos):
     mensaje.attach(adjunto)
 
     try:
-        server = smtplib.SMTP(smtp_server, smtp_port)
+        server = smtplib.SMTP(smtp_server, smtp_port, timeout=10)
         server.starttls()
         server.login(sender_email, sender_password)
         server.send_message(mensaje)
@@ -379,8 +360,17 @@ def enviar_correo(destinatario, datos):
         print(f"Correo enviado exitosamente a {destinatario}")
         return True
     except Exception as e:
-        print(f"Error al enviar correo: {e}")
+        print(f"Error al enviar correo ({destinatario}): {e}")
         return False
+
+def enviar_correo_async(destinatario, datos):
+    """
+    Inicia el envío de correo en un hilo separado para no bloquear el flujo principal.
+    """
+    thread = threading.Thread(target=enviar_correo, args=(destinatario, datos))
+    thread.daemon = True
+    thread.start()
+    return True
 
 def notificar_equipo_contrato(contrato_id, estado, motivo=None):
     """
