@@ -605,6 +605,8 @@ def documentacion_view(request):
     if estado == "Aceptado":
         return redirect("portal_publico")
 
+    error = None  # Inicializar siempre para evitar UnboundLocalError en GET
+
     if request.method == "POST":
         accion = (request.POST.get("accion") or "").strip()
         ultimo_contrato = _ultimo_contrato_usuario(usuario_id, vigente_id)
