@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import threading
 import logging
+import secrets
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
@@ -94,6 +95,12 @@ def _asegurar_proyecto_activo(solicitud, usuario_id):
         },
         upsert=True,
     )
+
+
+def _generar_password_temporal(longitud: int = 12) -> str:
+    chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$%&*!?"
+    longitud = max(8, int(longitud or 12))
+    return "".join(secrets.choice(chars) for _ in range(longitud))
 
 def perfil_admin(request):
     return render(request, "perfil_admin.html")
@@ -467,11 +474,12 @@ def _enviar_correos_bulk(destinatarios_list, estado, password=None, motivo=None)
 
     for dest in destinatarios_list:
         try:
+            pwd = dest.get("password") or password
             sent = enviar_correo_estado_solicitud(
                 destinatario=dest.get("correo"),
                 nombre=dest.get("nombre"),
                 estado=estado,
-                password=password,
+                password=pwd,
                 motivo=motivo,
             )
             if sent:
@@ -656,7 +664,7 @@ def actualizar_estado(request, id):
         logger.info(f"[ACEPTAR] Integrantes procesados: {len(integrantes)} → {[i.get('correo') for i in integrantes]}")
 
         # Lista para envío masivo en segundo plano
-        destinatarios_bulk = [{"correo": correo, "nombre": nombre}]
+        destinatarios_bulk = [{"correo": correo, "nombre": nombre, "password": password}]
 
         for integrante in integrantes:
             i_correo = (integrante.get("correo") or "").strip().lower()
@@ -665,10 +673,11 @@ def actualizar_estado(request, id):
             if not i_correo or i_correo == correo: # Evitar duplicar líder
                 continue
                 
+            i_password = _generar_password_temporal()
             datos_integra = {
                 "nombre": i_nombre,
                 "correo": i_correo,
-                "contrasena": password, # Misma password temporal para todos por simplicidad
+                "contrasena": i_password,
                 "rol_id": str(rol_emprendedor["_id"]),
                 "activo": True
             }
@@ -683,43 +692,52 @@ def actualizar_estado(request, id):
                 db.usuarios.insert_one({**datos_integra, "fecha_creacion": datetime.utcnow()})
             
             # Agregamos a la lista de envíos background
-            destinatarios_bulk.append({"correo": i_correo, "nombre": i_nombre})
+            destinatarios_bulk.append({"correo": i_correo, "nombre": i_nombre, "password": i_password})
 
         _asegurar_proyecto_activo(solicitud, usuario_lider_id)
 
         # 3. Enviar correos de aceptación en segundo plano (Bulk/Integrantes)
-        def process_bulk_emails(dest_list, pwd, req):
-            from apps.utils import email_service
-            for d in dest_list:
-                try:
-                    email_service.enviar_confirmacion_registro(
-                        destinatario=d["correo"],
-                        nombre=d["nombre"],
-                        password=pwd,
-                        request=req
-                    )
-                except Exception as e:
-                    logger.error(f"Error enviando bienvenida a {d['correo']}: {str(e)}")
+        from apps.utils import email_service
+        for d in destinatarios_bulk:
+            try:
+                sent = email_service.enviar_confirmacion_registro(
+                    destinatario=d["correo"],
+                    nombre=d["nombre"],
+                    password=d["password"],
+                    request=request,
+                )
+                if sent:
+                    mail_ok += 1
+                else:
+                    mail_fail += 1
+            except Exception as e:
+                mail_fail += 1
+                logger.error(f"Error enviando bienvenida a {d.get('correo')}: {str(e)}")
 
-        threading.Thread(
-            target=process_bulk_emails,
-            args=(destinatarios_bulk, password, request)
-        ).start()
-        mail_enviado = True
+        mail_enviado = (mail_fail == 0 and mail_ok > 0)
 
     else:
-        # Caso Rechazado: Enviar correo informativo en segundo plano
+        mail_ok = 0
+        mail_fail = 0
+
+        # Caso Rechazado: Enviar correo informativo
         from apps.utils import email_service
-        threading.Thread(
-            target=email_service.enviar_rechazo_solicitud,
-            args=(correo, nombre, motivo)
-        ).start()
-        mail_enviado = True
+        try:
+            sent = email_service.enviar_rechazo_solicitud(correo, nombre, motivo)
+            if sent:
+                mail_ok = 1
+            else:
+                mail_fail = 1
+        except Exception as e:
+            mail_fail = 1
+            logger.error(f"Error enviando rechazo a {correo}: {str(e)}")
+
+        mail_enviado = (mail_fail == 0 and mail_ok > 0)
 
     # Elimina la solicitud del tablero (aceptada pasa a usuarios, rechazada se descarta).
     db.solicitudes.delete_one({"_id": solicitud["_id"]})
 
-    return JsonResponse({"success": True, "mail_enviado": mail_enviado, "status": "Procesando correos en segundo plano"})
+    return JsonResponse({"success": True, "mail_enviado": mail_enviado, "mail_ok": mail_ok, "mail_fail": mail_fail})
 
 from django.shortcuts import render
 

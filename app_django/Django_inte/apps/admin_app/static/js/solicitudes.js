@@ -202,8 +202,14 @@ function actualizarEstado(id, nuevoEstado, password = null, motivo = null) {
             if (passError) passError.textContent = "";
 
             cargarSolicitudes();
+            const ok = Number(data.mail_ok || 0);
+            const fail = Number(data.mail_fail || 0);
             if (!data.mail_enviado) {
-                window.Toast.show("Estado actualizado, pero no se pudo enviar el correo de notificación.", "warning");
+                window.Toast.show(`Estado actualizado, pero falló el envío de correos (ok: ${ok}, fail: ${fail}).`, "warning");
+            } else if (fail > 0) {
+                window.Toast.show(`Estado actualizado. Correos enviados: ${ok}. Fallidos: ${fail}.`, "warning");
+            } else if (ok > 0) {
+                window.Toast.show(`Estado actualizado. Correos enviados: ${ok}.`, "success");
             }
         } else if (data.error) {
             window.Toast.show("Error: " + data.error, "danger");
