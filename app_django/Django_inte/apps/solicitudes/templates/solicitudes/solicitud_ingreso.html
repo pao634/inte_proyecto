@@ -4,223 +4,208 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Solicitud de Incubación</title>
+    <title>Solicitud de Incubación | Innovación & Talento</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-/* ==============================
-   1. Paleta de colores
-============================== */
 :root {
-    --azul: #1f3c88;
-    --azul2: #2d5bd1;
-    --gris: #f4f6f9;
-    --gris2: #e6e9ef;
-    --blanco: #ffffff;
-    --texto: #2b2b2b;
+    --azul-deep: #1e293b;
+    --azul-accent: #3b82f6;
+    --azul-glow: rgba(59, 130, 246, 0.5);
+    --glass: rgba(255, 255, 255, 0.95);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --bg-gradient: radial-gradient(circle at top right, #e0e7ff, #f8fafc);
 }
 
-/* ==============================
-   2. Reset + tipografía
-============================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Outfit', sans-serif;
 }
 
 body {
     min-height: 100vh;
-    background: var(--gris);
-    margin: 0;
+    background: var(--bg-gradient);
+    color: var(--text-main);
+    overflow-x: hidden;
 }
 
-/* ==============================
-   3. Header fijo
-============================== */
-header {
-    background: linear-gradient(90deg, var(--azul), var(--azul2));
-    color: var(--blanco);
-    padding: 10px 6%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-header h1 {
-    font-size: 18px;
-    font-weight: 600;
-}
-
-nav {
-    display: flex;
-    gap: 20px;
-}
-
-nav a {
-    color: var(--blanco);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    opacity: 0.9;
-    transition: opacity 0.3s ease;
-}
-
-nav a:hover {
-    opacity: 1;
-}
-
-/* ==============================
-   4. Contenedor principal
-============================== */
+/* Glassmorphism Card */
 .main-container {
-    margin-top: 90px;
+    margin-top: 100px;
     display: flex;
     justify-content: center;
-    padding: 20px 10px;
+    padding: 40px 20px;
+    animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .card {
     width: 100%;
-    max-width: 850px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(31, 60, 136, 0.2);
-    background: var(--blanco);
+    max-width: 900px;
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
 }
 
 .card-header {
-    background: linear-gradient(90deg, var(--azul), var(--azul2));
-    color: var(--blanco);
-    border-radius: 12px 12px 0 0;
+    background: linear-gradient(135deg, #1e293b, #334155);
+    color: white;
+    padding: 35px 20px;
     text-align: center;
-    padding: 15px 10px;
+    border: none;
+}
+
+.card-header h3 {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+}
+
+.card-header p {
+    opacity: 0.8;
+    font-weight: 300;
 }
 
 h5 {
-    color: var(--azul);
-    margin-top: 15px;
-    margin-bottom: 8px;
-    font-weight: 600;
+    color: var(--azul-deep);
+    font-weight: 700;
+    margin: 35px 0 20px 0;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 12px;
+    font-size: 1.15rem;
 }
 
-/* ==============================
-   5. Inputs y selects
-============================== */
-input,
-textarea,
-select {
-    border-radius: 6px !important;
-    border: 1px solid var(--gris2);
-    padding: 6px 10px;
-    font-size: 13px;
-    transition: all 0.25s ease;
+h5 i {
+    color: var(--azul-accent);
+    background: rgba(59, 130, 246, 0.1);
+    padding: 8px;
+    border-radius: 10px;
 }
 
-input:focus,
-textarea:focus,
-select:focus {
-    outline: none;
-    border-color: var(--azul2);
-    box-shadow: 0 0 8px rgba(45, 91, 209, 0.35);
+/* Form Controls */
+.form-control, .form-select {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px !important;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #f8fafc;
 }
 
-textarea {
-    resize: vertical;
+.form-control:focus, .form-select:focus {
+    background: white;
+    border-color: var(--azul-accent);
+    box-shadow: 0 0 0 4px var(--azul-glow);
+    transform: translateY(-1px);
 }
 
-/* ==============================
-   6. Botones
-============================== */
+.input-group .btn {
+    border-radius: 0 12px 12px 0 !important;
+}
+
+/* Buttons */
 .btn-primary {
-    background: linear-gradient(90deg, var(--azul), var(--azul2));
+    background: #1e293b;
     border: none;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 14px;
+    padding: 14px 30px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
 }
 
 .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 8px rgba(45, 91, 209, 0.3);
+    background: #0f172a;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(30, 41, 59, 0.3);
 }
 
-.btn-success {
-    background: linear-gradient(90deg, #4caf50, #81c784);
-    border: none;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
+.btn-outline-primary {
+    border-radius: 10px;
+    border: 1.5px solid var(--azul-accent);
+    color: var(--azul-accent);
+    font-weight: 600;
 }
 
-.btn-success:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 8px rgba(72, 187, 120, 0.3);
+.btn-outline-primary:hover {
+    background: var(--azul-accent);
+    color: white;
 }
 
-/* Contenedor de botones */
-.botones-form {
-    display: flex;
-    justify-content: center;   
-    gap: 12px;
-    margin-top: 20px;
-}
-
-/* BOTONES MÁS PEQUEÑOS EN PC */
-.botones-form .btn {
-    flex: 0;                   
-    min-width: 180px;          
-}
-
-/* ==============================
-   7. Alertas
-============================== */
-#alertPlaceholder .alert {
-    position: fixed;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    min-width: 300px;
-    max-width: 90%;
-    z-index: 2000;
+/* Table */
+.table {
     border-radius: 12px;
-    padding: 14px 22px;
-    font-size: 14px;
-    text-align: center;
-    color: #fff;
-    backdrop-filter: blur(5px);
-    opacity: 1;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-    transition: all 0.4s ease, transform 0.4s ease;
-    font-weight: 500;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
 }
 
-#alertPlaceholder .alert-success {
-    background: rgba(76, 175, 80, 0.95);
+.table thead {
+    background: #f1f5f9;
 }
 
-#alertPlaceholder .alert-danger {
-    background: rgba(220, 53, 69, 0.95);
+.table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px;
 }
 
-#alertPlaceholder .alert-warning {
-    background: rgba(255, 193, 7, 0.95);
-    color: #2b2b2b;
+
+/* Career Modal */
+.modal-content {
+    border-radius: 24px;
+    border: none;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
-#alertPlaceholder .alert.hide {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-25px);
+.modal-header {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 20px 25px;
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.career-option {
+    padding: 15px 20px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.career-option:hover {
+    background: #f1f5f9;
+    border-color: var(--azul-accent);
+    transform: translateX(5px);
+}
+
+.career-option i {
+    font-size: 1.2rem;
+    color: var(--azul-accent);
 }
 
 /* ==============================
@@ -267,8 +252,6 @@ textarea {
             </div>
 
             <div class="card-body p-4">
-                <div id="alertPlaceholder"></div>
-
                 <form id="solicitudForm" method="POST" novalidate>
                     {% csrf_token %}
 
@@ -277,7 +260,7 @@ textarea {
                     <div class="row g-2">
                         <div class="col-md-6"><input class="form-control" name="nombre_completo" placeholder="Nombre completo" required></div>
                         <div class="col-md-6">
-                        <input class="form-control" type="email" name="correo" placeholder="Correo electrónico" required pattern="^[a-zA-Z0-9._%+-]+@utacapulco\.edu\.mx$" title="El correo debe terminar en @utacapulco.edu.mx"></div>
+                        <input class="form-control" type="email" name="correo" placeholder="Correo electrónico" required pattern="^[a-zA-Z0-9._%+\-]+@utacapulco\.edu\.mx$" title="El correo debe terminar en @utacapulco.edu.mx"></div>
                         <div class="col-md-2"><input class="form-control" type="number" name="edad" placeholder="Edad" required min="1" max="100"></div>
                         <div class="col-md-3"><input class="form-control" name="matricula" placeholder="Matrícula" required></div>
                         <div class="col-md-3"><input class="form-control" name="telefono" placeholder="Teléfono" required></div>
@@ -357,8 +340,10 @@ textarea {
                     <textarea class="form-control mb-3" name="habilidades" placeholder="Tus habilidades" required></textarea>
                     <textarea class="form-control mb-4" name="logro_asombroso" placeholder="Cuéntanos algo asombroso que hayas construido" required></textarea>
 
-                    <div class="botones-form">
-                        <button type="submit" class="btn btn-primary w-50" id="submitBtn">Enviar Solicitud</button>
+                    <div class="botones-form pb-4">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="bi bi-send-fill me-2"></i> Enviar Solicitud de Ingreso
+                        </button>
                     </div>
 
                 {% include "solicitudes/cedula_inscripcion.html" %}
@@ -397,22 +382,6 @@ textarea {
 <script>
 const form = document.getElementById("solicitudForm");
 const submitBtn = document.getElementById("submitBtn");
-const alertPlaceholder = document.getElementById("alertPlaceholder");
-
-// ==================== Función de alertas ====================
-function showAlert(message, type = "success", timeout = 5000) {
-    const alert = document.createElement("div");
-    alert.className = `alert alert-${type} fade show text-center`;
-    alert.role = "alert";
-    alert.innerText = message;
-    alertPlaceholder.appendChild(alert);
-
-    // Desaparecer con transición suave
-    setTimeout(() => {
-        alert.classList.add("hide"); // activa animación
-        setTimeout(() => alert.remove(), 400); // remover después de 0.5s
-    }, timeout);
-}
 
 // ==================== Validación en tiempo real del correo ====================
 const correoInput = form.querySelector("[name='correo']");
@@ -429,7 +398,7 @@ if (!correoError) {
 }
 
 // Expresión regular estricta para correo
-const correoRegex = /^[a-zA-Z0-9._%+-]+@utacapulco\.edu\.mx$/;
+const correoRegex = /^[a-zA-Z0-9._%+\-]+@utacapulco\.edu\.mx$/;
 
 correoInput.addEventListener("input", function() {
     const value = correoInput.value.trim();
@@ -511,11 +480,16 @@ form.addEventListener("submit", async function (e) {
     submitBtn.disabled = true;
 
     // Validación de campos obligatorios
-    if (!form.checkValidity()) {
-        isSubmitting = false;
-        submitBtn.disabled = false;
-        showAlert("❌ Por favor completa todos los campos requeridos.", "danger");
-        return;
+    try {
+        if (!form.checkValidity()) {
+            isSubmitting = false;
+            submitBtn.disabled = false;
+            showAlert("❌ Por favor completa todos los campos requeridos.", "danger");
+            return;
+        }
+    } catch (err) {
+        console.error("Error en validación HTML5:", err);
+        // Continuamos si falla la validación nativa por algún bug de regex
     }
 
     // Validación estricta del correo (Líder)

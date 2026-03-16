@@ -174,7 +174,7 @@
       seleccionar(data.proyecto.id);
       cerrarModal();
     } catch (e) {
-      alert("No se pudo guardar el cambio. Intenta nuevamente.");
+      window.Toast?.show?.("No se pudo guardar el cambio.", "danger");
       console.error(e);
     } finally {
       confirmarBaja.disabled = false;
@@ -219,7 +219,7 @@
       seleccionar(seleccionado);
       cerrarModalFinalizar();
     } catch (e) {
-      alert("Error al finalizar el proyecto. Revisa el archivo e intenta de nuevo.");
+      window.Toast?.show?.("Error al finalizar el proyecto.", "danger");
       console.error(e);
       btnConfirmarFinalizar.disabled = false;
       finalizarStatus.style.display = "none";
@@ -284,7 +284,7 @@
       btnEliminar.disabled = true;
       
     } catch (e) {
-      alert("No se pudo eliminar el proyecto. Intenta nuevamente.");
+      window.Toast?.show?.("No se pudo eliminar el proyecto.", "danger");
       console.error(e);
     } finally {
       confirmarEliminar.disabled = false;

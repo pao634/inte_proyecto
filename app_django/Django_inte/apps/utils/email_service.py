@@ -1,14 +1,11 @@
 import os
-import smtplib
-import gridfs
 from io import BytesIO
 from datetime import datetime
-from dotenv import load_dotenv
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email import encoders
 import threading
+import gridfs
+
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
 
 from config.database.mongo import db
 
@@ -16,8 +13,6 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
-
-load_dotenv()
 
 # ==========================================================
 #  Utilidades de Email
@@ -344,19 +339,22 @@ def enviar_correo(destinatario, datos):
     """
     mensaje.attach(MIMEText(html, "html"))
 
+    # ======================================================
+    #  Enviar Correo usando Django Mail
+    # ======================================================
+    mensaje = EmailMultiAlternatives(
+        subject="Confirmacion de solicitud a la incubadora",
+        body="", # Texto plano vacío
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[destinatario]
+    )
+    mensaje.attach_alternative(html, "html")
+
     # Adjuntar PDF
-    adjunto = MIMEBase("application", "pdf")
-    adjunto.set_payload(pdf)
-    encoders.encode_base64(adjunto)
-    adjunto.add_header("Content-Disposition", "attachment", filename="Solicitud_Incubadora.pdf")
-    mensaje.attach(adjunto)
+    mensaje.attach("Solicitud_Incubadora.pdf", pdf, "application/pdf")
 
     try:
-        server = smtplib.SMTP(smtp_server, smtp_port, timeout=10)
-        server.starttls()
-        server.login(sender_email, sender_password)
-        server.send_message(mensaje)
-        server.quit()
+        mensaje.send(fail_silently=False)
         print(f"Correo enviado exitosamente a {destinatario}")
         return True
     except Exception as e:
@@ -503,14 +501,16 @@ def _enviar_correo_individual_contrato(destinatario, nombre, estado, motivo=None
     </body>
     </html>
     """
-    mensaje.attach(MIMEText(html, "html"))
+    mensaje = EmailMultiAlternatives(
+        subject=subject_text,
+        body="", 
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[destinatario]
+    )
+    mensaje.attach_alternative(html, "html")
 
     try:
-        server = smtplib.SMTP(smtp_server, smtp_port)
-        server.starttls()
-        server.login(sender_email, sender_password)
-        server.send_message(mensaje)
-        server.quit()
+        mensaje.send(fail_silently=False)
         return True
     except Exception:
         return False
@@ -572,20 +572,20 @@ def enviar_certificado_finalizacion(destinatario, nombre, proyecto_nombre, archi
     """
     mensaje.attach(MIMEText(html, "html"))
 
+    mensaje = EmailMultiAlternatives(
+        subject=f"🎓 ¡Felicidades! Proyecto Finalizado - {proyecto_nombre}",
+        body="", 
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[destinatario]
+    )
+    mensaje.attach_alternative(html, "html")
+
     # Adjuntar Documento
     if archivo_bin:
-        adjunto = MIMEBase("application", "octet-stream")
-        adjunto.set_payload(archivo_bin)
-        encoders.encode_base64(adjunto)
-        adjunto.add_header("Content-Disposition", "attachment", filename=nombre_archivo)
-        mensaje.attach(adjunto)
+        mensaje.attach(nombre_archivo, archivo_bin, "application/octet-stream")
 
     try:
-        server = smtplib.SMTP(smtp_server, smtp_port)
-        server.starttls()
-        server.login(sender_email, sender_password)
-        server.send_message(mensaje)
-        server.quit()
+        mensaje.send(fail_silently=False)
         return True
     except Exception as e:
         print(f"Error al enviar certificado: {e}")

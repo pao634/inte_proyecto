@@ -67,7 +67,32 @@
     </div>
 </div>
 
+<!-- Modal de Confirmación de Eliminación -->
+<div id="modalConfirmDeleteAnuncio" class="modal-fondo" style="display:none; z-index: 10000; align-items:center;">
+    <div class="modal-contenido" style="max-width: 400px; text-align:center;">
+        <h3 style="margin-bottom:15px;">¿Estás seguro?</h3>
+        <p style="margin-bottom:20px;">Esta acción no se puede deshacer. El anuncio será eliminado permanentemente.</p>
+        <div style="display:flex; gap:10px; justify-content:center;">
+            <button id="btnSiEliminar" class="btn-lanzar" style="background:#dc2626;">Eliminar</button>
+            <button onclick="cerrarConfirmDelete()" class="btn-lanzar" style="background:#9ca3af;">Cancelar</button>
+        </div>
+    </div>
+</div>
+
 <script>
+    let urlAEliminar = "";
+    function confirmarEliminar(e, url) {
+        e.preventDefault();
+        urlAEliminar = url;
+        document.getElementById("modalConfirmDeleteAnuncio").style.display = "flex";
+    }
+    function cerrarConfirmDelete() {
+        document.getElementById("modalConfirmDeleteAnuncio").style.display = "none";
+    }
+    document.getElementById("btnSiEliminar").onclick = () => {
+        window.location.href = urlAEliminar;
+    };
+
     const modal = document.getElementById("modalAnuncio");
 
     function abrirModal() { 
@@ -93,9 +118,7 @@
 
     document.querySelectorAll('.btn-eliminar').forEach(boton => {
         boton.onclick = (e) => {
-            if(!confirm("¿Estás completamente seguro de eliminar este anuncio? Esta acción no se puede deshacer.")) {
-                e.preventDefault();
-            }
+            confirmarEliminar(e, boton.getAttribute("href"));
         };
     });
 </script>

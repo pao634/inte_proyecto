@@ -90,18 +90,14 @@ function confirmarCambio(){
             cerrarModal()
 
         }else{
-
-            alert("No se pudo cambiar el estado del usuario")
-
+            window.Toast.show("No se pudo cambiar el estado del usuario", "danger")
         }
 
     })
 
     .catch(error => {
-
         console.error("Error:", error)
-        alert("Ocurrió un error al cambiar el estado")
-
+        window.Toast.show("Ocurrió un error al cambiar el estado", "danger")
     })
 
 }

@@ -106,7 +106,7 @@ if (typeof toggleReaction === 'undefined') {
             if (data.status === 'success') {
                 location.reload(); 
             } else {
-                alert(data.message || "Error al procesar la reacción");
+                showAlert(data.message || "Error al procesar la reacción", "danger");
             }
         });
     }
@@ -127,7 +127,7 @@ if (typeof toggleReaction === 'undefined') {
                 input.value = "";
                 location.reload(); 
             } else {
-                alert(data.message || "Error al enviar comentario");
+                showAlert(data.message || "Error al enviar comentario", "danger");
             }
         });
     }

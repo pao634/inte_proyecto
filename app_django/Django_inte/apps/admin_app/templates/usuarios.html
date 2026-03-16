@@ -360,122 +360,114 @@ opacity:1;
 
 {% include "modals/modal_confirmacion_usuario.html" %}
 
+<!-- Modal para cambiar contraseña -->
+<div id="modalPassword" class="modal-bg">
+    <div class="modal-box">
+        <h3>Nueva Contraseña</h3>
+        <p>Ingresa la nueva contraseña para el usuario.</p>
+        <input type="password" id="inputNuevaPass" class="form-control mb-3" placeholder="Mínimo 8 caracteres">
+        <div class="modal-buttons">
+            <button class="btn-confirmar" style="background: #0ea5e9;" onclick="confirmarPassword()">
+                Cambiar
+            </button>
+            <button class="btn-cancelar" onclick="cerrarModalPass()">
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para confirmar eliminación -->
+<div id="modalEliminar" class="modal-bg">
+    <div class="modal-box">
+        <h3>Eliminar Usuario</h3>
+        <p>¿Estás seguro de eliminar este usuario? Esta acción no se puede deshacer.</p>
+        <div class="modal-buttons">
+            <button class="btn-confirmar" onclick="confirmarEliminar()">
+                Eliminar
+            </button>
+            <button class="btn-cancelar" onclick="cerrarModalEliminar()">
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
+
 <script>
 
 let usuarioSeleccionado = null
 let accionBloquear = true
 
-
 function abrirModal(id, bloquear){
-
     usuarioSeleccionado = id
     accionBloquear = bloquear
-
     document.getElementById("modalConfirmacion").style.display = "flex"
-
     if(bloquear){
         document.getElementById("textoModal").innerText = "¿Deseas bloquear este usuario?"
     }else{
         document.getElementById("textoModal").innerText = "¿Deseas desbloquear este usuario?"
     }
-
 }
-
 
 function cerrarModal(){
     document.getElementById("modalConfirmacion").style.display = "none"
 }
 
-
 function confirmarCambio(){
-
-    /* Django genera la ruta correcta */
     let url = "{% url 'cambiar_estado_usuario' 'TEMP_ID' %}".replace("TEMP_ID", usuarioSeleccionado)
-
     fetch(url, {
-
         method: "POST",
-
         headers:{
             "Content-Type":"application/json",
             "X-CSRFToken":"{{ csrf_token }}"
         }
-
     })
-
     .then(response => {
-
-        if(!response.ok){
-            throw new Error("Error en la petición")
-        }
-
-        return response.json()
-
+        if(!response.ok) throw new Error("Error en la petición");
+        return response.json();
     })
-
     .then(data => {
-
         if(data.success){
-
             const estado = document.getElementById("estado-" + usuarioSeleccionado)
             const accion = document.getElementById("accion-" + usuarioSeleccionado)
-
             if(data.activo){
-
-                estado.innerHTML = `
-                <span class="badge-activo">
-                Activo
-                </span>
-                `
-
-                accion.innerHTML = `
-                <button class="btn-bloquear" onclick="abrirModal('${usuarioSeleccionado}',true)">
-                <i class="bi bi-lock"></i> Bloquear
-                </button>
-                `
-
+                estado.innerHTML = `<span class="badge-activo" style="padding: 4px 10px; border-radius: 4px;">Activo</span>`
+                accion.innerHTML = `<button class="btn-bloquear" onclick="abrirModal('${usuarioSeleccionado}',true)" style="min-width: unset; padding: 6px 12px; font-size: 0.85rem;" title="Bloquear Usuario"><i class="bi bi-lock"></i></button><button class="btn-desbloquear" style="background: #0ea5e9; min-width: unset; padding: 6px 12px; font-size: 0.85rem;" onclick="cambiarPassword('${usuarioSeleccionado}')" title="Cambiar Contraseña"><i class="bi bi-key"></i></button><button class="btn-bloquear" style="min-width: unset; padding: 6px 12px; font-size: 0.85rem;" onclick="eliminarUsuario('${usuarioSeleccionado}')" title="Eliminar Usuario"><i class="bi bi-trash"></i></button>`
             }else{
-
-                estado.innerHTML = `
-                <span class="badge-bloqueado">
-                Bloqueado
-                </span>
-                `
-
-                accion.innerHTML = `
-                <button class="btn-desbloquear" onclick="abrirModal('${usuarioSeleccionado}',false)">
-                <i class="bi bi-unlock"></i> Desbloquear
-                </button>
-                `
-
+                estado.innerHTML = `<span class="badge-bloqueado" style="padding: 4px 10px; border-radius: 4px;">Bloqueado</span>`
+                accion.innerHTML = `<button class="btn-desbloquear" onclick="abrirModal('${usuarioSeleccionado}',false)" style="min-width: unset; padding: 6px 12px; font-size: 0.85rem;" title="Desbloquear Usuario"><i class="bi bi-unlock"></i></button><button class="btn-desbloquear" style="background: #0ea5e9; min-width: unset; padding: 6px 12px; font-size: 0.85rem;" onclick="cambiarPassword('${usuarioSeleccionado}')" title="Cambiar Contraseña"><i class="bi bi-key"></i></button><button class="btn-bloquear" style="min-width: unset; padding: 6px 12px; font-size: 0.85rem;" onclick="eliminarUsuario('${usuarioSeleccionado}')" title="Eliminar Usuario"><i class="bi bi-trash"></i></button>`
             }
-
-            cerrarModal()
-
-        }else{
-
-            alert("No se pudo cambiar el estado del usuario")
-
+            cerrarModal();
+            window.Toast.show("Estado actualizado", "success");
+        } else {
+            window.Toast.show("No se pudo cambiar el estado", "danger");
         }
-
     })
-
     .catch(error => {
-
-        console.error("Error:", error)
-        alert("Ocurrió un error al cambiar el estado")
-
-    })
-
+        console.error("Error:", error);
+        window.Toast.show("Ocurrió un error al cambiar el estado", "danger");
+    });
 }
 
-async function cambiarPassword(id){
-    const nueva = prompt("Nueva contraseña (mínimo 8 caracteres):");
+/* Modales adicionales */
+function cambiarPassword(id){
+    usuarioSeleccionado = id;
+    document.getElementById("inputNuevaPass").value = "";
+    document.getElementById("modalPassword").style.display = "flex";
+}
+
+function cerrarModalPass(){
+    document.getElementById("modalPassword").style.display = "none";
+}
+
+async function confirmarPassword(){
+    const nueva = document.getElementById("inputNuevaPass").value.trim();
     if(!nueva || nueva.length < 8){
-        alert("Contraseña inválida.");
+        window.Toast.show("La contraseña debe tener al menos 8 caracteres", "warning");
         return;
     }
-    const url = "{% url 'actualizar_password_usuario' 'TEMP' %}".replace("TEMP", id);
+    const url = "{% url 'actualizar_password_usuario' 'TEMP' %}".replace("TEMP", usuarioSeleccionado);
     const resp = await fetch(url, {
         method: "POST",
         headers: {
@@ -486,17 +478,24 @@ async function cambiarPassword(id){
     });
     const data = await resp.json();
     if(data.success){
-        alert("Contraseña actualizada.");
+        cerrarModalPass();
+        window.Toast.show("Contraseña actualizada correctamente", "success");
     }else{
-        alert(data.error || "No se pudo actualizar.");
+        window.Toast.show(data.error || "No se pudo actualizar", "danger");
     }
 }
 
-async function eliminarUsuario(id){
-    if(!confirm("¿Eliminar usuario? Esta acción no se puede deshacer.")){
-        return;
-    }
-    const url = "{% url 'eliminar_usuario' 'TEMP' %}".replace("TEMP", id);
+function eliminarUsuario(id){
+    usuarioSeleccionado = id;
+    document.getElementById("modalEliminar").style.display = "flex";
+}
+
+function cerrarModalEliminar(){
+    document.getElementById("modalEliminar").style.display = "none";
+}
+
+async function confirmarEliminar(){
+    const url = "{% url 'eliminar_usuario' 'TEMP' %}".replace("TEMP", usuarioSeleccionado);
     const resp = await fetch(url, {
         method: "POST",
         headers:{
@@ -506,9 +505,11 @@ async function eliminarUsuario(id){
     });
     const data = await resp.json();
     if(data.success){
-        document.getElementById("usuario-"+id)?.remove();
+        cerrarModalEliminar();
+        document.getElementById("usuario-" + usuarioSeleccionado)?.remove();
+        window.Toast.show("Usuario eliminado", "success");
     }else{
-        alert(data.error || "No se pudo eliminar.");
+        window.Toast.show(data.error || "No se pudo eliminar", "danger");
     }
 }
 

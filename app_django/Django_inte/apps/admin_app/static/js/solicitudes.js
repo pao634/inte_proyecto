@@ -174,7 +174,7 @@ function abrirModalDetalleCompleto(s) {
 
 function actualizarEstado(id, nuevoEstado, password = null, motivo = null) {
     if (!id) {
-        alert("ID de solicitud no encontrado.");
+        window.Toast.show("ID de solicitud no encontrado.", "danger");
         return;
     }
     const payload = { estado: nuevoEstado };
@@ -203,15 +203,15 @@ function actualizarEstado(id, nuevoEstado, password = null, motivo = null) {
 
             cargarSolicitudes();
             if (!data.mail_enviado) {
-                alert("Estado actualizado, pero no se pudo enviar el correo de notificación.");
+                window.Toast.show("Estado actualizado, pero no se pudo enviar el correo de notificación.", "warning");
             }
         } else if (data.error) {
-            alert("Error: " + data.error);
+            window.Toast.show("Error: " + data.error, "danger");
         }
     })
     .catch(err => {
         console.error("Error en actualizarEstado:", err);
-        alert("Error de conexión al actualizar la solicitud.");
+        window.Toast.show("Error de conexión al actualizar la solicitud.", "danger");
     });
 }
 

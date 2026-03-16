@@ -25,6 +25,7 @@ from bson import ObjectId
 from docx2pdf import convert
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
+from django.core.mail import EmailMultiAlternatives
 
 ADMIN_ROLE_ID = "699eb18f8a2f8c9f2f85cc98"
 try:
@@ -443,20 +444,17 @@ def enviar_correo_estado_solicitud(destinatario, nombre, estado, password=None, 
         </html>
         """
 
-    mensaje.attach(MIMEText(html, "html"))
+    mensaje = EmailMultiAlternatives(
+        subject=mensaje_subject,
+        body="", # Texto plano vacío, usamos HTML
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[destinatario]
+    )
+    mensaje.attach_alternative(html, "html")
 
     try:
-        if smtp_server_conn:
-            smtp_server_conn.send_message(mensaje)
-            return True
-        else:
-            # Añadimos timeout para evitar bloqueos infinitos
-            server = smtplib.SMTP(smtp_host, smtp_port, timeout=10)
-            server.starttls()
-            server.login(sender_email, sender_password)
-            server.send_message(mensaje)
-            server.quit()
-            return True
+        mensaje.send(fail_silently=False)
+        return True
     except Exception as e:
         logger.error(f"Error enviando correo a {destinatario}: {str(e)}")
         return False
@@ -472,19 +470,14 @@ def _background_enviar_correos_bulk(destinatarios_list, estado, password=None, m
         return
 
     try:
-        server = smtplib.SMTP(smtp_host, smtp_port, timeout=15)
-        server.starttls()
-        server.login(sender_email, sender_password)
         for dest in destinatarios_list:
             enviar_correo_estado_solicitud(
                 destinatario=dest.get("correo"),
                 nombre=dest.get("nombre"),
                 estado=estado,
                 password=password,
-                motivo=motivo,
-                smtp_server_conn=server
+                motivo=motivo
             )
-        server.quit()
     except Exception as e:
         logger.error(f"Error en bulk email background: {str(e)}")
 

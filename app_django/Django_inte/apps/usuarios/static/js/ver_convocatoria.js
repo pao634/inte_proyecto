@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const img = card.querySelector(".conv-img");
 
             if (!img) {
-                alert("Esta convocatoria no tiene imagen para descargar.");
+                showAlert("Esta convocatoria no tiene imagen para descargar.", "warning");
                 return;
             }
 
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const img = card.querySelector(".conv-img");
 
             if(!img){
-                alert("Esta convocatoria no tiene imagen.");
+                showAlert("Esta convocatoria no tiene imagen.", "warning");
                 return;
             }
 

@@ -13,3 +13,60 @@
 </footer>
 
 <link rel="stylesheet" href="{% static 'css/shared_footer.css' %}?v=60">
+
+<!-- Global Toast Container -->
+<div id="globalAlertPlaceholder" style="position: fixed; top: 30px; right: 30px; z-index: 10000; display: flex; flex-direction: column; gap: 12px;"></div>
+
+<script>
+function showAlert(message, type = "success", timeout = 5000) {
+    const placeholder = document.getElementById("globalAlertPlaceholder");
+    if (!placeholder) return;
+
+    const alert = document.createElement("div");
+    alert.style.cssText = `
+        min-width: 300px;
+        padding: 16px 20px;
+        border-radius: 16px;
+        background: white;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-left: 6px solid #cbd5e1;
+        color: #1e293b;
+        font-weight: 600;
+        font-family: 'Outfit', sans-serif;
+        animation: toastSlideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transition: all 0.4s ease;
+    `;
+
+    if (type === "success") alert.style.borderLeftColor = "#22c55e";
+    else if (type === "danger") alert.style.borderLeftColor = "#ef4444";
+    else if (type === "warning") alert.style.borderLeftColor = "#f59e0b";
+
+    let icon = "bi-info-circle";
+    if (type === "success") icon = "bi-check-circle-fill";
+    if (type === "danger") icon = "bi-exclamation-triangle-fill";
+    if (type === "warning") icon = "bi-exclamation-circle-fill";
+
+    alert.innerHTML = `<i class="bi ${icon}" style="font-size: 1.2rem; color: ${alert.style.borderLeftColor}"></i><span>${message}</span>`;
+    
+    placeholder.appendChild(alert);
+
+    setTimeout(() => {
+        alert.style.opacity = "0";
+        alert.style.transform = "translateX(100px)";
+        setTimeout(() => alert.remove(), 400);
+    }, timeout);
+}
+
+// Keyframes for animation
+const style = document.createElement('style');
+style.innerHTML = `
+@keyframes toastSlideIn {
+    from { opacity: 0; transform: translateX(50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+`;
+document.head.appendChild(style);
+</script>

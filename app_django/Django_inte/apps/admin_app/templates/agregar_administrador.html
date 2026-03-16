@@ -330,7 +330,7 @@ function cerrarModalEliminar(){
 async function confirmarCambioPassword(){
     const nueva = document.getElementById("nuevaPassword").value.trim();
     if(!nueva || nueva.length < 8){
-        alert("La contraseña debe tener mínimo 8 caracteres");
+        window.Toast.show("La contraseña debe tener mínimo 8 caracteres", "warning");
         return;
     }
     try {
@@ -349,7 +349,7 @@ async function confirmarCambioPassword(){
         }
     } catch(err){
         console.error(err);
-        alert("Error al actualizar la contraseña");
+        window.Toast.show("Error al actualizar la contraseña", "danger");
     }
 }
 
@@ -367,7 +367,7 @@ async function confirmarEliminar(){
         }
     } catch(err){
         console.error(err);
-        alert("Error al eliminar el administrador");
+        window.Toast.show("Error al eliminar el administrador", "danger");
     }
 }
 
@@ -396,7 +396,7 @@ async function crearAdministrador() {
     const pwd = document.getElementById("password").value;
 
     if (!nombre || !correo || !pwd) {
-        alert("Por favor, rellena todos los campos");
+        window.Toast.show("Por favor, rellena todos los campos", "warning");
         return;
     }
 
@@ -411,11 +411,11 @@ async function crearAdministrador() {
 
     const data = await response.json();
     if (data.status === "success") {
-        alert("Administrador creado con éxito");
+        window.Toast.show("Administrador creado con éxito", "success");
         cerrarModal();
-        location.reload(); 
+        setTimeout(() => location.reload(), 1000); 
     } else {
-        alert("Error: " + data.message);
+        window.Toast.show("Error: " + data.message, "danger");
     }
 }
 
@@ -467,7 +467,7 @@ async function cambiarEstadoAdmin(id, bloquear, btn){
             `;
         }
     } else {
-        alert("No se pudo cambiar el estado");
+        window.Toast.show("No se pudo cambiar el estado", "danger");
     }
 }
 

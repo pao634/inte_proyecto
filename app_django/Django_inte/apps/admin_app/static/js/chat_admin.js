@@ -289,7 +289,7 @@
         const archivo = fileInput.files[0];
         
         if (!currentProjectId) {
-            alert("Error: No hay un proyecto seleccionado. Por favor selecciona un proyecto de la lista.");
+            window.Toast.show("No hay un proyecto seleccionado.", "danger");
             return;
         }
         if (!mensaje && !archivo) return;
@@ -308,7 +308,7 @@
             if (!res.ok) {
                 const errorText = await res.text();
                 console.error("Chat send error:", res.status, errorText);
-                alert("Error al enviar mensaje: " + res.status + ". " + errorText);
+                window.Toast.show("Error al enviar mensaje.", "danger");
                 return;
             }
 
@@ -320,7 +320,7 @@
             await loadConversations(true);
         } catch (err) {
             console.error("Chat send exception:", err);
-            alert("Error de conexión al enviar mensaje: " + err.message);
+            window.Toast.show("Error de conexión al enviar mensaje.", "danger");
         }
     });
 
