@@ -691,39 +691,44 @@ def actualizar_estado(request, id):
             else:
                 db.usuarios.insert_one({**datos_integra, "fecha_creacion": datetime.utcnow()})
             
-            # Agregamos a la lista de envíos background
+            # Agregamos a la lista de envíos
             credenciales_equipo.append({"correo": i_correo, "nombre": i_nombre, "password": i_password})
 
         _asegurar_proyecto_activo(solicitud, usuario_lider_id)
 
         # 3. Enviar correos de aceptación en segundo plano (Bulk/Integrantes)
-        from apps.utils import email_service
+        # Enviar correos individuales (lider + integrantes) en segundo plano.
+        def process_bulk_emails(dest_list, req):
+            from apps.utils import email_service
+            ok = 0
+            fail = 0
+            for d in dest_list:
+                try:
+                    sent = email_service.enviar_confirmacion_registro(
+                        destinatario=d["correo"],
+                        nombre=d["nombre"],
+                        password=d["password"],
+                        request=req,
+                    )
+                    if sent:
+                        ok += 1
+                    else:
+                        fail += 1
+                except Exception as e:
+                    fail += 1
+                    logger.error(f"Error enviando bienvenida a {d.get('correo')}: {str(e)}")
 
-        # Opcion actual: solo enviamos al lider las credenciales de TODO el equipo (por limitaciones de proveedor/dominio).
-        try:
-            sent = email_service.enviar_credenciales_equipo_lider(
-                destinatario_lider=correo,
-                nombre_lider=nombre,
-                credenciales_equipo=credenciales_equipo,
-                request=request,
-            )
-            mail_ok = 1 if sent else 0
-            mail_fail = 0 if sent else 1
-            mail_enviado = bool(sent)
-        except Exception as e:
-            mail_ok = 0
-            mail_fail = 1
-            mail_enviado = False
-            logger.error(f"Error enviando credenciales al lider {correo}: {str(e)}")
+            logger.info(f"[ACEPTAR] Emails enviados ok={ok} fail={fail}")
 
-        # FUTURO: envios individuales por integrante (re-activar cuando se pueda enviar a otros correos)
-        # for d in credenciales_equipo:
-        #     email_service.enviar_confirmacion_registro(
-        #         destinatario=d["correo"],
-        #         nombre=d["nombre"],
-        #         password=d["password"],
-        #         request=request,
-        #     )
+        threading.Thread(
+            target=process_bulk_emails,
+            args=(credenciales_equipo, request),
+            daemon=True,
+        ).start()
+
+        mail_ok = 0
+        mail_fail = 0
+        mail_enviado = True
 
     else:
         mail_ok = 0
@@ -746,7 +751,10 @@ def actualizar_estado(request, id):
     # Elimina la solicitud del tablero (aceptada pasa a usuarios, rechazada se descarta).
     db.solicitudes.delete_one({"_id": solicitud["_id"]})
 
-    return JsonResponse({"success": True, "mail_enviado": mail_enviado, "mail_ok": mail_ok, "mail_fail": mail_fail})
+    payload = {"success": True, "mail_enviado": mail_enviado, "mail_ok": mail_ok, "mail_fail": mail_fail}
+    if nuevo_estado == "Aceptado":
+        payload["status"] = "Correos en proceso de envío."
+    return JsonResponse(payload)
 
 from django.shortcuts import render
 

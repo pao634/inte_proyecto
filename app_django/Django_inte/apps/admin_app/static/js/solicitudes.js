@@ -202,6 +202,11 @@ function actualizarEstado(id, nuevoEstado, password = null, motivo = null) {
             if (passError) passError.textContent = "";
 
             cargarSolicitudes();
+
+            if (data.status) {
+                window.Toast.show(data.status, "info");
+                return;
+            }
             const ok = Number(data.mail_ok || 0);
             const fail = Number(data.mail_fail || 0);
             if (!data.mail_enviado) {

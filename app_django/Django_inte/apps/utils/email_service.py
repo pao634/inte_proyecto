@@ -374,6 +374,9 @@ def enviar_credenciales_equipo_lider(destinatario_lider, nombre_lider, credencia
 
     credenciales_equipo: lista de dicts [{nombre, correo, password}]
     """
+    raise NotImplementedError(
+        "Función desactivada: ahora se envían correos individuales a cada integrante."
+    )
     portal_url = request.build_absolute_uri('/login/') if request else os.getenv("PORTAL_URL", "https://incubadora-ut.onrender.com/login/")
 
     subject = "✅ Credenciales del equipo - Incubadora de Empresas"
