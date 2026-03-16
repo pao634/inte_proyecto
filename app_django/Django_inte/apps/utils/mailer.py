@@ -80,7 +80,8 @@ def _send_via_sendgrid(
             timeout=15,
         )
         return resp.status_code in (200, 202)
-    except Exception:
+    except Exception as e:
+        print(f"[Mailer] SendGrid Error: {str(e)}")
         return False
 
 
@@ -96,18 +97,21 @@ def send_email(
     """
     Envia correo. Si existe SENDGRID_API_KEY se usa SendGrid (HTTPS),
     si no, se usa SMTP (Django EmailMultiAlternatives).
-
-    attachments: [{filename, content_bytes, mime_type}]
     """
     to_list = [e for e in list(to) if e]
+    print(f"[Mailer] Intentando enviar correo a: {to_list}")
     if not to_list:
+        print("[Mailer] Error: Lista de destinatarios vacía.")
         return False
 
     provider = (os.getenv("EMAIL_PROVIDER") or "").strip().lower()
     sendgrid_key = (os.getenv("SENDGRID_API_KEY") or "").strip()
+    
     if provider in ("sendgrid",) or sendgrid_key:
+        print(f"[Mailer] Usando proveedor: SendGrid (Key: {'***' if sendgrid_key else 'Missing'})")
         from_addr = (os.getenv("SENDGRID_FROM_EMAIL") or from_email or settings.DEFAULT_FROM_EMAIL or "").strip()
         if not sendgrid_key or not from_addr:
+            print(f"[Mailer] Error: SendGrid requiere API_KEY y FROM_EMAIL. (From: {from_addr})")
             return False
         return _send_via_sendgrid(
             subject=subject,
@@ -118,6 +122,10 @@ def send_email(
             api_key=sendgrid_key,
             attachments=attachments,
         )
+
+    print(f"[Mailer] Usando proveedor: SMTP (Host: {settings.EMAIL_HOST}, User: {settings.EMAIL_HOST_USER})")
+    if not settings.EMAIL_HOST_USER or not settings.EMAIL_HOST_PASSWORD:
+        print("[Mailer] Error: Faltan credenciales SMTP (EMAIL_HOST_USER/PASSWORD).")
 
     return _send_via_smtp(
         subject=subject,
