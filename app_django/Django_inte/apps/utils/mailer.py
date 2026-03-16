@@ -96,54 +96,6 @@ def _send_via_sendgrid(
         return False
 
 
-def _send_via_resend(
-    *,
-    subject: str,
-    text_body: str,
-    html_body: Optional[str],
-    to: Iterable[str],
-    from_email: str,
-    api_key: str,
-    attachments: Optional[list[dict]] = None,
-) -> bool:
-    payload: dict = {
-        "from": from_email,
-        "to": list(to),
-        "subject": subject,
-        "text": text_body or "",
-        "html": html_body or "",
-    }
-
-    if attachments:
-        payload["attachments"] = [
-            {
-                "content": base64.b64encode(att["content_bytes"]).decode("ascii"),
-                "filename": att["filename"],
-            }
-            for att in attachments
-        ]
-
-    try:
-        resp = requests.post(
-            "https://api.resend.com/emails",
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
-            json=payload,
-            timeout=15,
-        )
-        if resp.status_code in (200, 201):
-            logger.info(f"Resend: Correo enviado correctamente a {to}")
-            return True
-        else:
-            logger.error(f"Resend Error ({resp.status_code}): {resp.text}")
-            return False
-    except Exception as e:
-        logger.error(f"Error crítico en Resend API: {str(e)}", exc_info=True)
-        return False
-
-
 def send_email(
     *,
     subject: str,
@@ -154,7 +106,7 @@ def send_email(
     from_email: Optional[str] = None,
 ) -> bool:
     """
-    Envia correo. Soporta Resend (Recomendado), SendGrid o SMTP.
+    Envia correo. Soporta SendGrid o SMTP.
     """
     to_list = [e for e in list(to) if e]
     logger.info(f"Iniciando proceso de envío de correo a: {to_list}")
@@ -163,25 +115,10 @@ def send_email(
         return False
 
     provider = (os.getenv("EMAIL_PROVIDER") or "").strip().lower()
-    resend_key = (os.getenv("RESEND_API_KEY") or "").strip()
     sendgrid_key = (os.getenv("SENDGRID_API_KEY") or "").strip()
 
     allow_smtp = (os.getenv("ALLOW_SMTP_FALLBACK") or "").strip().lower() in ("1", "true", "yes") or bool(getattr(settings, "DEBUG", False))
     allow_fallbacks = (os.getenv("EMAIL_ALLOW_FALLBACKS") or "").strip().lower() in ("1", "true", "yes")
-
-    def _try_resend() -> bool:
-        if not resend_key:
-            return False
-        from_addr = (os.getenv("RESEND_FROM_EMAIL") or from_email or settings.DEFAULT_FROM_EMAIL or "onboarding@resend.dev").strip()
-        return _send_via_resend(
-            subject=subject,
-            text_body=text_body,
-            html_body=html_body,
-            to=to_list,
-            from_email=from_addr,
-            api_key=resend_key,
-            attachments=attachments,
-        )
 
     def _try_sendgrid() -> bool:
         if not sendgrid_key:
@@ -202,7 +139,7 @@ def send_email(
 
     def _try_smtp() -> bool:
         if not allow_smtp:
-            logger.error("SMTP deshabilitado. En Render normalmente SMTP está bloqueado; usa Resend/SendGrid.")
+            logger.error("SMTP deshabilitado. En Render normalmente SMTP está bloqueado; usa SendGrid.")
             return False
         logger.info(f"Usando proveedor: SMTP (Host: {settings.EMAIL_HOST})")
         return _send_via_smtp(
@@ -219,22 +156,16 @@ def send_email(
         providers_to_try.append(provider)
         # Si el proveedor está configurado explícitamente, por defecto NO probamos otros (evita confusiones y 403/timeout).
         if allow_fallbacks:
-            for p in ("resend", "sendgrid", "smtp"):
+            for p in ("sendgrid", "smtp"):
                 if p not in providers_to_try:
                     providers_to_try.append(p)
     else:
-        if resend_key:
-            providers_to_try.append("resend")
         if sendgrid_key:
             providers_to_try.append("sendgrid")
         providers_to_try.append("smtp")
 
     for p in providers_to_try:
-        if p == "resend":
-            logger.info("Intentando proveedor: Resend")
-            if _try_resend():
-                return True
-        elif p == "sendgrid":
+        if p == "sendgrid":
             logger.info("Intentando proveedor: SendGrid")
             if _try_sendgrid():
                 return True
