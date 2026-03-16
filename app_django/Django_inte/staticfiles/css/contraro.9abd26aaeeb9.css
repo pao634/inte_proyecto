@@ -1,0 +1,122 @@
+body { margin: 0; font-family: Arial, sans-serif; background: #f3f6fb; color: #16213d; }
+
+    .contract-navbar { background: linear-gradient(135deg, #19377d, #274ca7); color: #fff; box-shadow: 0 8px 22px rgba(17, 34, 78, 0.18); }
+    .contract-navbar-inner { 
+        display: flex; 
+        align-items: center; 
+        justify-content: space-between; 
+        padding: 0 1%; 
+        height: 65px;
+            
+     }
+    .brand-wrap{
+        display:flex;
+        align-items:center;
+        gap:15px;
+        flex-grow: 0;
+        
+    }
+    .brand-logo{
+        width:48px;
+        height:48px;
+        background: white;
+        border-radius:50%;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        flex-shrink: 0;
+    }
+     .brand-logo img { 
+        width: 32px;  
+        height: 32px; 
+        object-fit: contain; 
+    }
+    .brand-copy { min-width: 0; }
+    .brand-title { 
+    font-size: 16px; 
+    font-weight: 700; 
+    line-height: 1.1; 
+    }
+
+    .brand-subtitle { 
+        margin-top: 2px; 
+        font-size: 11px; 
+        color: rgba(255, 255, 255, 0.7); 
+    }
+    .brand-chip { display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.22); font-size: 13px; font-weight: 700; }
+    .logout-link { border: 0; border-radius: 10px; background: #d92d20; color: #fff; padding: 10px 16px; font-weight: 700; cursor: pointer; }
+    .logout-link:hover { background: #b92318; }
+    .contract-layout { max-width: 1080px; margin: 30px auto 40px auto; padding: 0 16px; }
+    .contract-head { background: linear-gradient(135deg, #1b3579, #2d5bd1); color: #fff; border-radius: 14px; padding: 18px 20px; margin-bottom: 16px; }
+    .contract-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
+    .cardx { background: #fff; border-radius: 12px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); padding: 18px; }
+    .status-pill { display: inline-block; padding: 6px 12px; border-radius: 999px; font-weight: 700; background: #e9eeff; color: #1b3579; }
+    .status-pill.ok { background: #e7f7ee; color: #146c35; }
+    .status-pill.warn { background: #fff4db; color: #875b00; }
+    .status-pill.bad { background: #fde8e8; color: #8a1f11; }
+    .alertx { background: #fde8e8; color: #8a1f11; border: 1px solid #f5b6b6; border-radius: 8px; padding: 10px 12px; margin-top: 10px; }
+    .pdf-frame { width: 100%; min-height: 620px; border: 1px solid #d6dbee; border-radius: 8px; background: #fff; }
+    .btn-primary { background: #1f3c88; color: #fff; }
+    .btn-secondary { background: #e7ecff; color: #123073; text-decoration: none; display: inline-block; }
+    .form-block { margin-top: 12px; border-top: 1px solid #e8ebf6; padding-top: 12px; }
+    .field-item { margin-bottom: 12px; }
+    .field-item label { display: block; font-weight: 700; margin-bottom: 6px; }
+    .sign-pad { border: 2px dashed #2d5bd1; border-radius: 8px; width: 100%; height: 140px; background: #fafcff; margin-bottom: 6px; }
+    .hint { color: #58607a; font-size: 13px; }
+    
+    
+
+    .field-item input[type="text"],
+    .field-item input[type="file"],
+    .field-item select {
+        width: 100%;            
+        box-sizing: border-box; 
+        padding: 10px;
+        border: 1px solid #d4daea;
+        border-radius: 6px;
+        display: block;         
+        margin-bottom: 10px;    
+    }
+
+    .field-item input[type="file"] {
+        background: #fafcff;
+        cursor: pointer;
+    }
+
+    .btnx {
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-weight: 700;
+        cursor: pointer;
+        text-align: center;
+        box-sizing: border-box;
+        display: block;      /* Por defecto, ocupa el 100% de ancho */
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .pdf-frame { width: 100%; height: 600px; border: 1px solid #d6dbee; border-radius: 8px; }
+    
+    @media (max-width: 900px) {
+        .contract-navbar-inner { 
+        flex-direction: column; 
+        gap: 12px; 
+        height: auto; 
+        padding: 15px;
+        }
+
+        .brand-wrap { text-align: center; }
+        .brand-chip { font-size: 12px; width: 100%; justify-content: center; }
+        .logout-link { width: 100%; }
+
+        .contract-grid { 
+            grid-template-columns: 1fr; /* Una sola columna en móvil */
+        }
+
+        .contract-head { text-align: center; }
+        
+        .pdf-frame { height: 450px; } /* Reducimos altura de PDF en móvil */
+
+        .btn-secondary { width: 100%; text-align: center; }
+    }

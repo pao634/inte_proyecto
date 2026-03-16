@@ -1,0 +1,306 @@
+:root{
+    --azul: #1f3c88;
+    --azul-accent: #2563eb;
+    --azul-vibrant: #3b82f6;
+    --azul2: #2563eb; /* Compatibilidad */
+    --navy-900: #0f172a;
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-500: #64748b;
+    --slate-900: #1e293b;
+    --blanco: #ffffff;
+    --rojo: #ef4444;
+}
+
+/* ========================
+   RESET + TIPOGRAFÍA
+======================== */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI", Arial, sans-serif;
+}
+
+html {
+    height: 100%;
+}
+
+html, body{
+    margin:0;
+    padding:0;
+}
+
+body{
+    background:var(--gris);
+    color:var(--texto);
+    line-height:1.7;
+    font-size:16px;
+
+    /* IMPORTANTE: evita que el contenido quede debajo del navbar */
+    padding-top:53px;
+    min-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* ========================
+   HERO / CARRUSEL PRO
+======================== */
+.hero{
+    height:75vh;
+    min-height:420px;
+    max-height:800px;
+    position:relative;
+    overflow:hidden;
+    background:#000;
+}
+
+/* SLIDES */
+.slide{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    transition:opacity 1s ease-in-out;
+}
+
+.slide.active{
+    opacity:1;
+}
+
+.slide img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center;
+    filter:brightness(55%);
+    display:block;
+}
+
+/* ========================
+   TEXTO DEL CARRUSEL
+======================== */
+.caption{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    color:white;
+    width:80%;
+    max-width:900px;
+    z-index:20;
+    animation:fadeUp 1s ease;
+}
+
+.caption h2{
+    font-size:clamp(26px,5vw,52px);
+    font-weight:700;
+    margin-bottom:18px;
+    text-shadow:0 5px 15px rgba(0,0,0,0.5);
+}
+
+.caption p{
+    font-size:18px;
+    font-weight:300;
+    opacity:.95;
+}
+
+/* ANIMACIÓN TEXTO */
+@keyframes fadeUp{
+    from{
+        opacity:0;
+        transform:translate(-50%,-30%);
+    }
+    to{
+        opacity:1;
+        transform:translate(-50%,-50%);
+    }
+}
+
+/* ========================
+   BOTONES DEL CARRUSEL
+======================== */
+.prev,
+.next{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:45px;
+    height:45px;
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(6px);
+    color:white;
+    border:none;
+    font-size:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    border-radius:50%;
+    transition:.3s;
+    z-index:30;
+}
+
+.prev:hover,
+.next:hover{
+    background:var(--azul);
+}
+
+.prev{
+    left:20px;
+}
+
+.next{
+    right:20px;
+}
+
+/* ========================
+   SECCIONES
+======================== */
+.section{
+    width:90%;
+    max-width:1200px;
+    margin:80px auto;
+}
+
+.section h3{
+    font-size:28px;
+    color:var(--azul);
+    margin-bottom:35px;
+    font-weight:600;
+    position:relative;
+    padding-left:14px;
+}
+
+.section h3::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:6px;
+    height:70%;
+    width:5px;
+    background:var(--azul2);
+    border-radius:4px;
+}
+
+/* ========================
+   TARJETAS
+======================== */
+.card{
+    background:var(--blanco);
+    padding:35px;
+    border-radius:14px;
+    box-shadow:0 10px 25px rgba(0,0,0,.06);
+    transition:.3s ease;
+}
+
+.card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 15px 35px rgba(0,0,0,.08);
+}
+
+.card h4{
+    color:var(--azul);
+    margin-bottom:12px;
+    font-size:18px;
+}
+
+.card p{
+    margin-bottom:14px;
+    font-size:15px;
+}
+
+/* LISTAS */
+.lista-info,
+.lista-proceso{
+    list-style:none;
+    padding-left:0;
+}
+
+.lista-info li,
+.lista-proceso li{
+    margin-bottom:10px;
+    padding-left:22px;
+    position:relative;
+    font-size:15px;
+}
+
+.lista-info li::before,
+.lista-proceso li::before{
+    content:"✔";
+    position:absolute;
+    left:0;
+    color:var(--azul2);
+    font-weight:bold;
+}
+
+/* ========================
+   BOTONES
+======================== */
+.btn{
+    display:inline-block;
+    margin-top:15px;
+    padding:9px 18px;
+    background:var(--azul);
+    color:white;
+    border-radius:6px;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:500;
+    transition:.3s;
+}
+
+.btn:hover{
+    background:var(--azul-vibrant);
+    transform:translateY(-2px);
+}
+
+/* Legacy Footer removed */
+
+/* ========================
+   RESPONSIVE
+======================== */
+
+/* Tablets */
+@media (max-width:900px){
+
+    .caption h2{
+        font-size:32px;
+    }
+
+    .caption p{
+        font-size:15px;
+    }
+
+}
+
+/* Celulares */
+@media (max-width:600px){
+
+    .hero{
+        height:50vh;
+    }
+
+    .caption h2{
+        font-size:22px;
+    }
+
+    .caption p{
+        font-size:14px;
+    }
+
+    .section{
+        margin:50px auto;
+    }
+
+    .section h3{
+        font-size:22px;
+    }
+
+    .card{
+        padding:22px;
+    }
+
+}

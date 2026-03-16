@@ -1,0 +1,82 @@
+.unique-shared-footer {
+    background-color: #1a3675; /* Azul profundo premium similar a la imagen */
+    color: #ffffff;
+    padding: 20px 0;
+    width: 100%;
+    margin-top: auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+}
+
+.unique-shared-footer .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex !important;
+    justify-content: center !important; /* Forzar centrado */
+    align-items: center !important;
+    padding: 0 20px;
+    gap: 40px;
+}
+
+.unique-shared-footer .footer-copyright {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.unique-shared-footer .footer-links {
+    display: flex;
+    gap: 25px;
+}
+
+.unique-shared-footer .footer-links a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: opacity 0.3s ease, transform 0.2s ease;
+}
+
+.unique-shared-footer .footer-links a:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .unique-shared-footer .footer-content {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        gap: 15px;
+        padding: 0 20px;
+    }
+    
+    .unique-shared-footer .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+}
+
+.portal-modal,
+.lightbox-modal {
+    display: none !important;
+}
+
+.portal-modal.active,
+.lightbox-modal.active {
+    display: flex !important;
+}
+
+/* El modal de noticia necesita flex cuando se muestra vía JS */
+#modal-noticia.active,
+.lightbox-modal.active {
+    display: flex !important;
+}
+
+/* Estilo específico para asegurar que no rompa el layout del admin */
+body:has(.layout) .unique-shared-footer {
+    margin-top: 0;
+    z-index: 10;
+    flex-shrink: 0; /* No se encoge */
+}

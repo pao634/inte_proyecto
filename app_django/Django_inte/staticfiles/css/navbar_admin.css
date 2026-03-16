@@ -1,0 +1,143 @@
+/* ===== TOPBAR ===== */
+.topbar{
+background:var(--azul);
+color:white;
+padding:0 20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+height:65px;
+box-shadow:0 2px 8px rgba(0,0,0,0.15);
+}
+
+.topbar h1{
+font-size:17px;
+font-weight:500;
+}
+
+.topbar-right{
+display:flex;
+align-items:center;
+gap:20px;
+}
+
+/* LOGO */
+
+.logo-container{
+display:flex;
+align-items:center;
+gap:20px;
+}
+
+.logo-circle{
+width:48px;
+height:48px;
+background:white;
+border-radius:50%;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:6px;
+box-shadow:0 2px 5px rgba(0,0,0,0.2);
+transition:transform .3s ease;
+}
+
+.logo-circle:hover{
+transform:scale(1.05);
+}
+
+.logo-img{
+width:100%;
+height:100%;
+object-fit:contain;
+mix-blend-mode:multiply;
+}
+
+/* ===== AVATAR ===== */
+
+.avatar-container{
+position:relative;
+}
+
+.avatar{
+width:48px;
+height:48px;
+border-radius:50%;
+background:var(--azul2);
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:700;
+font-size:14px;
+color:white;
+cursor:pointer;
+border:1.5px solid var(--azul2);
+transition:.2s;
+}
+
+.avatar:hover{
+transform:scale(1.05);
+background:var(--gris2);
+}
+
+/* DROPDOWN */
+
+.dropdown{
+position:absolute;
+left:0;
+top:45px;
+background:white;
+width:160px;
+border-radius:8px;
+box-shadow:0 4px 12px rgba(0,0,0,0.15);
+opacity:0;
+border:1px solid var(--gris2);
+overflow:hidden;
+transition:.25s;
+}
+
+.dropdown a{
+display:block;
+padding:12px;
+text-decoration:none;
+color:var(--texto);
+font-size:14px;
+}
+
+.dropdown a:hover{
+background:var(--gris2);
+}
+
+.avatar-container.active .dropdown{
+opacity:1;
+transform:translateY(0);
+pointer-events:auto;
+}
+
+/* ===== LOGOUT ===== */
+
+.logout-btn{
+background:linear-gradient(135deg,var(--rojo),var(--rojoHover));
+color:white;
+padding:9px 18px;
+border-radius:30px;
+text-decoration:none;
+font-size:14px;
+font-weight:600;
+display:flex;
+align-items:center;
+gap:8px;
+transition:.25s ease;
+box-shadow:0 4px 10px rgba(0,0,0,.15);
+}
+
+.logout-btn:hover{
+transform:translateY(-2px);
+box-shadow:0 6px 14px rgba(0,0,0,.25);
+}
+
+.logout-btn svg{
+width:20px;
+height:20px;
+stroke-width:2.5;
+}

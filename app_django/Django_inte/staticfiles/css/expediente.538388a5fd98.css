@@ -1,0 +1,261 @@
+.expediente-shell {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 34px 22px 48px;
+}
+
+.expediente-hero {
+    background: linear-gradient(135deg, #103170 0%, #1f56b5 100%);
+    color: #fff;
+    border-radius: 24px;
+    padding: 28px;
+    display: flex;
+    justify-content: space-between;
+    gap: 22px;
+    align-items: flex-start;
+    box-shadow: 0 18px 35px rgba(16, 49, 112, 0.22);
+}
+
+.expediente-kicker {
+    margin: 0 0 8px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.expediente-hero h2 {
+    margin: 0 0 8px;
+    font-size: 34px;
+    line-height: 1.1;
+}
+
+.expediente-subtitle {
+    margin: 0;
+    max-width: 720px;
+    color: rgba(255, 255, 255, 0.86);
+}
+
+.expediente-stats {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.stat-card {
+    min-width: 120px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.stat-card strong {
+    display: block;
+    font-size: 28px;
+    margin-top: 4px;
+}
+
+.stat-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.feedback {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    font-weight: 600;
+}
+
+.feedback.ok {
+    background: #e7f8ee;
+    color: #14653d;
+    border: 1px solid #b8e4c7;
+}
+
+.feedback.error {
+    background: #feeceb;
+    color: #a1261b;
+    border: 1px solid #f2beb9;
+}
+
+.expediente-grid {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.upload-card,
+.document-card,
+.empty-card {
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 16px 32px rgba(21, 33, 72, 0.08);
+}
+
+.upload-card {
+    padding: 24px;
+    position: sticky;
+    top: 24px;
+}
+
+.upload-card h3,
+.empty-card h3,
+.document-card h3 {
+    margin: 0 0 10px;
+}
+
+.upload-card p,
+.empty-card p {
+    margin: 0 0 18px;
+    color: #5a6784;
+    line-height: 1.5;
+}
+
+.upload-form {
+    display: grid;
+    gap: 12px;
+}
+
+.upload-form label {
+    font-weight: 700;
+    color: #19315f;
+}
+
+.upload-form input[type="text"],
+.upload-form input[type="file"] {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #d8e0f0;
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: #f9fbff;
+}
+
+.upload-form button {
+    border: 0;
+    border-radius: 14px;
+    padding: 13px 18px;
+    background: #1f56b5;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.upload-tip {
+    margin-top: 16px;
+    padding: 14px;
+    border-radius: 16px;
+    background: #eff4ff;
+    color: #213b72;
+    line-height: 1.5;
+}
+
+.history-column {
+    display: grid;
+    gap: 16px;
+}
+
+.document-card {
+    padding: 22px;
+}
+
+.document-card-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.document-card-head p {
+    margin: 0;
+    color: #5b6781;
+}
+
+.version-badge {
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: #edf3ff;
+    color: #1d4fa8;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.document-meta {
+    margin-bottom: 14px;
+    color: #6f7b96;
+    font-size: 14px;
+}
+
+.version-list {
+    display: grid;
+    gap: 10px;
+}
+
+.version-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 16px;
+    border: 1px solid #e2e8f4;
+    border-radius: 16px;
+    background: #fbfcff;
+}
+
+.version-main {
+    display: grid;
+    gap: 4px;
+}
+
+.version-main span {
+    color: #5b6781;
+    word-break: break-word;
+}
+
+.version-side {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    color: #5b6781;
+    font-size: 14px;
+}
+
+.version-side a {
+    text-decoration: none;
+    color: #1f56b5;
+    font-weight: 700;
+}
+
+.empty-card {
+    padding: 30px 24px;
+}
+
+@media (max-width: 980px) {
+    .expediente-hero,
+    .document-card-head,
+    .version-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .expediente-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .upload-card {
+        position: static;
+    }
+
+    .version-side {
+        justify-content: flex-start;
+    }
+}

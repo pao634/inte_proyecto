@@ -191,6 +191,11 @@ def enviar_correo_async(destinatario, datos):
     return True
 
 def notificar_equipo_contrato(contrato_id, estado, motivo=None):
+    thread = threading.Thread(target=_background_notificar_equipo_contrato, args=(contrato_id, estado, motivo))
+    thread.start()
+    return True
+
+def _background_notificar_equipo_contrato(contrato_id, estado, motivo=None):
     try:
         from bson.objectid import ObjectId
         contrato = db.contrato_proyecto.find_one({"_id": ObjectId(str(contrato_id))})
@@ -250,6 +255,14 @@ def _enviar_correo_individual_contrato(destinatario, nombre, estado, motivo=None
     )
 
 def enviar_certificado_finalizacion(destinatario, nombre, proyecto_nombre, archivo_bin, nombre_archivo="Certificado.pdf"):
+    thread = threading.Thread(
+        target=_background_enviar_certificado,
+        args=(destinatario, nombre, proyecto_nombre, archivo_bin, nombre_archivo)
+    )
+    thread.start()
+    return True
+
+def _background_enviar_certificado(destinatario, nombre, proyecto_nombre, archivo_bin, nombre_archivo):
     sub = f"🎓 ¡Felicidades! Proyecto Finalizado - {proyecto_nombre}"
     html = f"""
     <div style="font-family:sans-serif; text-align:center; padding:40px;">
@@ -269,10 +282,3 @@ def enviar_certificado_finalizacion(destinatario, nombre, proyecto_nombre, archi
             "mime_type": "application/pdf",
         }],
     )
-    if archivo_bin:
-        mensaje.attach(nombre_archivo, archivo_bin, "application/pdf")
-    try:
-        mensaje.send()
-        return True
-    except:
-        return False

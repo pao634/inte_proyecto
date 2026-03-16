@@ -1,0 +1,145 @@
+/* --- CSS COMPLETO: VISTA DE CONTRATO VIGENTE --- */
+
+:root {
+    --azul-pro: #1e3a8a;
+    --azul-soft: #3b82f6;
+    --verde-agua: #2dd4bf;
+    --verde-agua-soft: #f0fdfa;
+    --gris-fondo: #f8fafc;
+    --blanco: #ffffff;
+    --texto: #1e293b;
+    --borde: #e2e8f0;
+}
+
+/* 1. Contenedor Principal */
+.vigente-wrap {
+    width: 90%;
+    max-width: 900px;
+    margin: 40px auto;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.panel-header {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--borde);
+}
+
+.panel-header h2 {
+    color: var(--azul-pro);
+    border-left: 5px solid var(--verde-agua);
+    padding-left: 15px;
+    font-weight: 800;
+    font-size: 1.8rem;
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+
+/* 2. Tarjeta y Secciones */
+.vigente-card {
+    background: var(--blanco);
+    border-radius: 16px;
+    padding: 35px;
+    border: 1px solid var(--borde);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+}
+
+.info-section {
+    background: var(--gris-fondo);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    border-left: 4px solid var(--azul-soft);
+}
+
+.info-section p { margin: 5px 0; color: var(--texto); }
+.info-section strong { color: var(--azul-pro); }
+
+.note {
+    color: #64748b;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+/* 3. Botones con Efecto de Brillo */
+.vigente-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.btnx {
+    position: relative;
+    overflow: hidden;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Animación de Brillo */
+.btnx::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -75%; width: 50%; height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: skewX(-25deg);
+    transition: all 0.7s ease-in-out;
+}
+
+.btnx:hover::before { left: 125%; }
+
+.btnx:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
+}
+
+.btnx:active { transform: translateY(0) scale(0.97); }
+
+/* Variantes de Color */
+.btn-primary { background: linear-gradient(135deg, #3b82f6, #1e3a8a); }
+.btn-danger { background: linear-gradient(135deg, #ef4444, #991b1b); }
+.btn-link { background: var(--verde-agua); color: var(--azul-pro); }
+
+/* 4. Formulario e Inputs */
+form {
+    padding-top: 25px;
+    border-top: 1px solid var(--borde);
+}
+
+label { 
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 700; 
+    color: var(--azul-pro);
+}
+
+input[type="file"] {
+    padding: 20px;
+    border: 2px dashed var(--borde);
+    width: 100%;
+    background: var(--gris-fondo);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+input[type="file"]:hover {
+    border-color: var(--verde-agua);
+    background: var(--verde-agua-soft);
+}
+
+hr { border: 0; border-top: 1px solid var(--borde); margin: 30px 0; }
+

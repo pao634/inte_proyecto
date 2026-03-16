@@ -1,0 +1,407 @@
+:root {
+    --azul: #1f3c88;
+    --azul2: #2d5bd1;
+    --verde-agua: #2dd4bf;
+    --verde-agua-soft: #f0fdfa;
+    --gris: #f4f6f9;
+    --gris2: #e6e9ef;
+    --blanco: #ffffff;
+    --texto: #2b2b2b;
+    --rojo: #ef4444;
+    --borde: #e2e8f0
+}
+
+/* ===== RESET ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    background: var(--gris);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    flex: 1;
+    padding: 40px;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.convocatorias-container {
+    width: 100%;
+    max-width: 1000px;
+}
+
+/* ===== CABECERA MODERNA ===== */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+    margin-bottom: 40px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--borde);
+}
+
+.header-container h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--azul);
+    border-left: 6px solid var(--verde-agua);
+    padding-left: 14px;
+}
+
+/* ===== BOTONES MODERNOS ===== */
+.btn-crear, .btn-guardar, .btn-confirmar-eliminar, .btn-cancelar {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    color: var(--blanco);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.btn-crear, .btn-guardar {
+    background: linear-gradient(135deg, var(--azul), var(--azul2));
+}
+
+.btn-crear:hover, .btn-guardar:hover {
+    background: linear-gradient(135deg, var(--azul2), var(--azul));
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+.btn-crear:active, .btn-guardar:active {
+    transform: translateY(0) scale(0.97);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+.btn-crear::before, .btn-guardar::before, .btn-confirmar-eliminar::before, .btn-cancelar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: rgba(255,255,255,0.25);
+    transform: skewX(-25deg);
+    transition: all 0.7s ease-in-out;
+}
+
+.btn-crear:hover::before, .btn-guardar:hover::before, .btn-confirmar-eliminar:hover::before, .btn-cancelar:hover::before { 
+    left: 125%; 
+}
+
+/* BOTÓN ELIMINAR MODERNO */
+.btn-confirmar-eliminar {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+}
+
+.btn-confirmar-eliminar:hover {
+    background: linear-gradient(135deg, #b91c1c, #991b1b);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+.btn-confirmar-eliminar:active {
+    transform: translateY(0) scale(0.97);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+/* BOTÓN CANCELAR CON ANIMACIÓN COMO ELIMINAR */
+.btn-cancelar {
+    background: linear-gradient(135deg, #9ca3af, #6b7280);
+}
+
+.btn-cancelar:hover {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+.btn-cancelar:active {
+    transform: translateY(0) scale(0.97);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+/* ===== TABLA ===== */
+.table-wrapper {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+thead {
+    background: var(--azul);
+    color: white;
+}
+
+thead th {
+    padding: 14px;
+    font-size: 14px;
+}
+
+tbody td {
+    padding: 14px;
+    border-bottom: 1px solid var(--gris2);
+    font-size: 14px;
+}
+
+tbody tr:hover { background: var(--gris); }
+
+.banner-mini {
+    width: 70px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin: 0 auto;
+}
+
+/* ===== BOTONES EDICIÓN/ELIMINAR ===== */
+.acciones {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn-editar, .btn-eliminar {
+    padding: 8px 16px; 
+    border-radius: 8px; 
+    text-decoration: none;
+    font-weight: 600; 
+    font-size: 13px; 
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-editar {
+    color: var(--azul); 
+    background-color: var(--verde-agua-soft);
+    border: 1.5px solid var(--verde-agua);
+}
+
+.btn-editar:hover { background: var(--verde-agua); color: white; }
+
+.btn-eliminar {
+    color: var(--rojo); 
+    border: 1.5px solid var(--rojo);
+    background: transparent;
+}
+
+.btn-eliminar:hover { background: var(--rojo); color: white; }
+
+/* ===== MODAL ===== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    transition: opacity 0.3s ease;
+}
+
+.modal-content {
+    background: #ffffff;
+    padding: 35px 30px;
+    width: 420px;
+    border-radius: 16px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+
+    /* NUEVA ANIMACIÓN SUAVE DE ENTRADA DESDE EL FRENTE */
+    transform: scale(0.8);
+    opacity: 0;
+    animation: modalEntrance 0.35s ease-out forwards;
+}
+
+@keyframes modalEntrance {
+    0% { transform: scale(0.8); opacity: 0; }
+    60% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-content h3 {
+    margin-bottom: 20px;
+    color: var(--azul);
+    font-size: 22px;
+    text-align: center;
+}
+
+/* BOTÓN CERRAR MODAL (X) */
+.modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: var(--texto);
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.modal-close:hover {
+    color: var(--rojo);
+}
+
+/* INPUTS MODAL */
+.modal-content input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    border: 1px solid var(--gris2);
+    background-color: #f9f9f9;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.modal-content input:focus { 
+    border-color: var(--azul2);
+    box-shadow: 0 0 6px rgba(45, 91, 209, 0.3);
+    outline: none;
+}
+
+/* CONTENEDOR BOTONES EN MODAL */
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.modal-actions button {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    color: var(--blanco);
+}
+
+.modal-actions button.cancelar {
+    background: linear-gradient(135deg, #9ca3af, #6b7280);
+}
+
+.modal-actions button.cancelar:hover {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+.modal-actions button.cancelar:active {
+    transform: translateY(0) scale(0.97);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+.modal-actions button.confirmar {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+}
+
+.modal-actions button.confirmar:hover {
+    background: linear-gradient(135deg, #b91c1c, #991b1b);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+.modal-actions button.confirmar:active {
+    transform: translateY(0) scale(0.97);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+@media(max-width:768px){
+    .convocatorias-container{ padding: 10px; }
+    .header-container { flex-direction: column; gap: 15px; text-align: center; }
+    .header-container h2 { border-left: none; padding-left: 0; }
+    
+    /* TRANSFORM TABLE TO CARDS */
+    .table-wrapper { background: transparent; box-shadow: none; border: none; }
+    table, thead, tbody, th, td, tr { display: block; width: 100%; }
+    thead { display: none; }
+    
+    tr {
+        background: white;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+        padding: 20px;
+    }
+
+    td {
+        text-align: left !important;
+        padding: 10px 0 !important;
+        border: none !important;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+    }
+
+    td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        font-size: 11px;
+    }
+
+    td:last-child {
+        margin-top: 15px;
+        padding-top: 20px !important;
+        border-top: 1px solid #f1f5f9 !important;
+        justify-content: center;
+    }
+    
+    .acciones {
+        width: 100%;
+        justify-content: center;
+        gap: 20px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 25px 20px;
+    }
+}

@@ -669,20 +669,24 @@ def actualizar_estado(request, id):
         _asegurar_proyecto_activo(solicitud, usuario_lider_id)
 
         # Enviar correos de aceptación en segundo plano (Bulk)
-        mail_ok, mail_fail = _enviar_correos_bulk(destinatarios_bulk, nuevo_estado, password, None)
-        mail_enviado = (mail_fail == 0 and mail_ok > 0)
+        threading.Thread(
+            target=_background_enviar_correos_bulk,
+            args=(destinatarios_bulk, nuevo_estado, password, None)
+        ).start()
+        mail_enviado = True
 
     else:
         # Caso Rechazado: Enviar correo informativo en segundo plano
-        sent = enviar_correo_estado_solicitud(correo, nombre, nuevo_estado, None, motivo)
-        mail_ok = 1 if sent else 0
-        mail_fail = 0 if sent else 1
-        mail_enviado = bool(sent)
+        threading.Thread(
+            target=enviar_correo_estado_solicitud,
+            args=(correo, nombre, nuevo_estado, None, motivo)
+        ).start()
+        mail_enviado = True
 
     # Elimina la solicitud del tablero (aceptada pasa a usuarios, rechazada se descarta).
     db.solicitudes.delete_one({"_id": solicitud["_id"]})
 
-    return JsonResponse({"success": True, "mail_enviado": mail_enviado, "mail_ok": mail_ok, "mail_fail": mail_fail})
+    return JsonResponse({"success": True, "mail_enviado": mail_enviado, "status": "Procesando correos en segundo plano"})
 
 from django.shortcuts import render
 

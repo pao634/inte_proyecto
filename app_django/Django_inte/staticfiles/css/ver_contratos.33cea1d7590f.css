@@ -1,0 +1,363 @@
+/* 1. Reset y Variables */
+:root {
+    --azul-pro: #1e3a8a;
+    --azul-soft: #3b82f6;
+    --verde-agua: #2dd4bf;
+    --verde-agua-soft: #f0fdfa;
+    --gris-fondo: #f8fafc;
+    --blanco: #ffffff;
+    --texto: #1e293b;
+    --borde: #e2e8f0;
+   
+}
+
+/* 2. Body y Wrapper */
+.uta-wrapper {
+    width: 90%;
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+    height: 80vh; 
+    overflow-y: auto; 
+    box-sizing: border-box;
+}
+
+.uta-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+.uta-wrapper::-webkit-scrollbar-thumb {
+    background-color: var(--borde);
+    border-radius: 4px;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--borde);
+}
+
+
+
+/* Filtro en tiempo real */
+
+.search-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 320px; 
+}
+
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--blanco);
+    border: 2px solid var(--borde);
+    border-radius: 15px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-wrapper:focus-within {
+    border-color: var(--azul-soft);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.search-wrapper i {
+    position: absolute;
+    left: 14px;
+    color: #94a3b8;
+    font-size: 1.1rem;
+}
+
+.search-wrapper input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: none;
+    border-radius: 12px;
+    outline: none;
+    background: transparent;
+    font-size: 0.95rem;
+    color: var(--texto);
+}
+
+/* 3. Título */
+.uta-wrapper h2 {
+    color: var(--azul-pro);
+    border-left: 5px solid var(--verde-agua);
+    padding-left: 15px;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 0px;
+}
+
+/* 4. Tarjeta de Contrato */
+.uta-card-admin-item {
+    background: var(--blanco);
+    padding: 18px 25px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--borde);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    transition: all 0.3s ease;
+}
+
+.uta-card-admin-item:hover {
+    border-color: var(--verde-agua);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(45, 212, 191, 0.1);
+}
+
+.estado-pendiente, .estado-aceptado, .estado-rechazado {
+    display: inline-block; 
+    width: auto;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 4px 10px; 
+    border-radius: 6px;
+    line-height: 1;
+}
+
+.badge{
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:999px;
+    font-weight:700;
+    font-size:12px;
+}
+
+.badge-ok{
+    background:#dcfce7;
+    color:#166534;
+    border:1px solid #bbf7d0;
+}
+
+.badge-bad{
+    background:#fee2e2;
+    color:#991b1b;
+    border:1px solid #fecaca;
+}
+
+.info {
+    flex: 0 1 auto;
+    display: flex;      
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    margin-right: 40px;
+  
+}
+
+/* Colores de estado  */
+.estado-pendiente { background: #ffedd5 !important; color: #9a3412 !important; }
+.estado-aceptado { background: #dcfce7 !important; color: #15803d !important; }
+.estado-rechazado { background: #fee2e2 !important; color: #b91c1c !important; }
+
+/* 5. Info Contrato */
+.uta-card-admin-item strong {
+    color: var(--azul-pro);
+    font-size: 1.1rem;
+    display: block;
+    font-weight: 700; 
+    letter-spacing: -0.2px;
+}
+
+.uta-card-admin-item small {
+    display: block;
+    margin-top: 4px;
+    color: var(--azul-pro);
+    background: var(--verde-agua-soft);
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    width: fit-content;
+}
+
+/* 6. Acciones y Botones (Corregido) */
+.acciones {
+
+    display: flex;
+    gap: 12px;
+    width: 40%;
+    margin-left: auto;
+}
+
+.btn-ver, .btn-aceptar, .btn-rechazar {
+    position: relative;
+    overflow: hidden;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    flex: 1;
+    margin: 0;
+}
+
+/* Efecto de brillo */
+.btn-ver::before, .btn-aceptar::before, .btn-rechazar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: skewX(-25deg);
+    transition: all 0.7s ease-in-out;
+}
+
+.btn-ver:hover::before, .btn-aceptar:hover::before, .btn-rechazar:hover::before {
+    left: 125%;
+}
+
+
+
+.btn-ver {
+    background: linear-gradient(135deg, #3b82f6, #2563eb); /* Azul para Ver */
+}
+
+.btn-aceptar {
+    background: linear-gradient(135deg, #2dd4bf, #26b3a3); /* Verde para Aceptar */
+}
+
+.btn-rechazar {
+    background: linear-gradient(135deg, #ef4444, #dc2626); /* Rojo para Rechazar */
+}
+
+/* Botón solo (Cuando no hay aceptar/rechazar) */
+.btn-ver-solo {
+    flex: 0 1 auto !important;
+    min-width: 140px;
+}
+
+
+/* Efectos de Hover y Click */
+.btn-ver:hover, .btn-aceptar:hover, .btn-rechazar:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.btn-ver:active, .btn-aceptar:active, .btn-rechazar:active {
+    transform: translateY(0) scale(0.97);
+}
+
+
+
+
+
+/* --- Estilo para el Mensaje Sin Resultados --- */
+
+
+#mensajeSinResultados {
+    display: none; 
+    margin: 30px auto !important; 
+    width: 100%;
+    max-width: 500px; 
+    box-sizing: border-box;
+    text-align: center;
+    padding: 50px 20px;
+    background: var(--blanco);
+    border-radius: 16px;
+    border: 2px dashed var(--borde);
+    color: #64748b;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+}
+
+#mensajeSinResultados i {
+    font-size: 3rem;
+    color: var(--azul-soft);
+    opacity: 0.6;
+    display: block;
+    margin-bottom: 5px;
+}
+
+#mensajeSinResultados::before {
+    content: "No se encontraron coincidencias";
+    display: block;
+    font-weight: 700;
+    color: var(--azul-pro);
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+#mensajeSinResultados::after {
+    content: "Intenta con términos más generales o verifica la ortografía.";
+    display: block;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    font-weight: 400;
+    line-height: 1.4;
+}
+#mensajeSinResultados[style*="display: block"] {
+    display: flex !important; 
+    animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 8. Responsive */
+@media (max-width: 768px) {
+    .panel-header{
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .search-bar input{
+        width: 100%;
+    }
+
+    .uta-card-admin-item {
+        flex-direction: column; 
+        align-items: stretch;  
+        text-align: center;
+    }
+
+    .info {
+        margin-right: 0;        
+        margin-bottom: 20px;   
+        align-items: center;    
+    }
+
+    .acciones {
+        width: 100%;           
+        margin-left: 0;         
+        flex-direction: column; 
+        gap: 10px;              
+    }
+
+    .btn-ver, .btn-aceptar, .btn-rechazar {
+        width: 50px;       
+        padding: 10px 0;   
+        justify-content: center;
+    }
+
+    .btn-ver span, .btn-aceptar span, .btn-rechazar span {
+        display: none; 
+    }
+}

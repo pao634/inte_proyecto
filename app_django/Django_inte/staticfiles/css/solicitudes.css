@@ -1,0 +1,227 @@
+/* =========================
+   BLOQUEAR SCROLL
+========================= */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* =========================
+   BOTONES Y ACCIONES
+========================= */
+.btn,
+.dropdown-btn,
+.dropdown-content button {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn:hover,
+.dropdown-btn:hover,
+.dropdown-content button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+/* Clases de colores para botones */
+.cancelar-gris { background: #64748b; color: white; }
+.cancelar-gris:hover { background: #475569; }
+
+.confirmar-verde { background: #16a34a; color: white; }
+.confirmar-verde:hover { background: #15803d; }
+
+.confirmar-rojo { background: #dc2626; color: white; }
+.confirmar-rojo:hover { background: #b91c1c; }
+
+/* =========================
+   DROPDOWN DE ACCIONES
+========================= */
+.acciones { 
+    position: relative; 
+    display: inline-block; 
+}
+
+.dropdown-btn {
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.dropdown-btn:hover { background: #2563eb; }
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0; 
+    top: 100%;
+    margin-top: 8px;
+    background: white;
+    min-width: 180px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.25s ease;
+}
+
+.dropdown-content button {
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    background: none;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #334155;
+    font-size: 14px;
+}
+
+.dropdown-content button:hover { 
+    background: #f8fafc; 
+    color: #0f172a;
+}
+
+.show-dropdown {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+
+}
+
+
+.btn-ver-solicitud, 
+.status {
+    height: 32px;            
+    padding: 0 16px;       
+    display: inline-flex;    
+    align-items: center;     
+    justify-content: center;
+    font-size: 13px;        
+    font-weight: 600;
+    border-radius: 8px;      
+    border: none;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-sizing: border-box;  
+}
+
+
+.btn-ver-solicitud {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn-ver-solicitud:hover {
+    background-color: #2563eb;
+}
+
+
+.btn-ver-solicitud i {
+    margin-right: 8px; 
+    font-size: 16px;   
+}
+
+.status {
+    color: white;
+    width: auto;             
+    min-width: 100px;        
+}
+
+.estado-aceptado { background-color: #16a34a; }
+.estado-rechazado { background-color: #dc2626; }
+.estado-proceso { background-color: #f59e0b; }
+
+.filters{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+}
+.filters input,
+.filters select{
+    padding:10px 14px;
+    border:1px solid #d8dde6;
+    border-radius:12px;
+    min-width:190px;
+    font-size:14px;
+    background:#ffffff;
+    box-shadow:0 6px 14px rgba(0,0,0,0.04);
+    transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+.filters input::placeholder{
+    color:#9ca3af;
+}
+.filters input:focus,
+.filters select:focus{
+    outline:none;
+    border-color:#3b82f6;
+    box-shadow:0 10px 24px rgba(59,130,246,0.15);
+    transform:translateY(-1px);
+}
+
+.skeleton-table{
+    display:grid;
+    gap:8px;
+    padding:12px 0;
+}
+.skeleton-row{
+    height:42px;
+    border-radius:8px;
+    background:linear-gradient(90deg,#e5e7eb 25%, #f1f5f9 37%, #e5e7eb 63%);
+    background-size:400% 100%;
+    animation:shimmer 1.2s infinite;
+}
+@keyframes shimmer{
+    0%{background-position:100% 0;}
+    100%{background-position:-100% 0;}
+}
+
+@media(max-width:768px){
+    .convocatorias-container{ padding: 10px; }
+    .header-container h2{ font-size: 24px; }
+    
+    /* TRANSFORM TABLE TO CARDS */
+    .table-wrapper { background: transparent; box-shadow: none; border: none; }
+    table, thead, tbody, th, td, tr { display: block; width: 100%; }
+    thead { display: none; }
+    
+    tr {
+        background: white;
+        margin-bottom: 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+        padding: 15px;
+    }
+
+    td {
+        text-align: left !important;
+        padding: 8px 0 !important;
+        border: none !important;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+    }
+
+    td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        font-size: 11px;
+    }
+
+    td:last-child {
+        margin-top: 10px;
+        padding-top: 15px !important;
+        border-top: 1px solid #f1f5f9 !important;
+    }
+}
