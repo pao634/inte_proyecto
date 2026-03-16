@@ -279,8 +279,8 @@ h5 i {
                         <div class="col-md-6">
                         <input class="form-control" type="email" name="correo" placeholder="Correo electrónico" required pattern="^[a-zA-Z0-9._%+\-]+@utacapulco\.edu\.mx$" title="El correo debe terminar en @utacapulco.edu.mx"></div>
                         <div class="col-md-2"><input class="form-control" type="number" name="edad" placeholder="Edad" required min="1" max="100"></div>
-                        <div class="col-md-3"><input class="form-control" name="matricula" placeholder="Matrícula" required></div>
-                        <div class="col-md-3"><input class="form-control" name="telefono" placeholder="Teléfono" required></div>
+                        <div class="col-md-3"><input class="form-control" type="number" name="matricula" placeholder="Matrícula" required></div>
+                        <div class="col-md-3"><input class="form-control" type="number" name="telefono" placeholder="Teléfono" required></div>
                         <div class="col-md-4"><input class="form-control" name="nivel" placeholder="Nivel" required></div>
                         <div class="col-md-4"><input class="form-control" type="number" name="integrantes_equipo" placeholder="Integrantes en equipo" required min="1" max="100"></div>
                         <div class="col-md-8">
@@ -395,22 +395,29 @@ h5 i {
                   </div>
                 </div>
 
-                <!-- Sección de éxito (reemplaza al modal) -->
-                <div id="successNotification" style="display: none; text-align: center; padding: 40px 20px; animation: fadeIn 0.5s ease-out;">
-                    <div style="background: #dcfce7; color: #166534; padding: 30px; border-radius: 20px; border: 1px solid #bbf7d0;">
-                        <i class="bi bi-check-circle-fill" style="font-size: 3.5rem; display: block; margin-bottom: 15px;"></i>
-                        <h4 style="font-weight: 800; margin-bottom: 10px;">¡Solicitud enviada con éxito!</h4>
-                        <p style="font-size: 1.1rem; margin-bottom: 25px;">Te hemos enviado un correo de confirmación con tu <strong>Cédula de Inscripción</strong> adjunta en formato PDF.</p>
-                        <div class="d-flex justify-content-center gap-3">
-                            <button type="button" class="btn btn-primary" onclick="generarPDF()">
-                                <i class="bi bi-file-earmark-pdf-fill me-2"></i>Descargar Cédula
-                            </button>
-                            <button type="button" class="btn btn-outline-primary" onclick="location.reload()">
-                                <i class="bi bi-arrow-clockwise me-2"></i>Nueva Solicitud
-                            </button>
+                <!-- Modal de éxito minimalista -->
+                <div class="modal fade" id="minimalSuccessModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+                    <div class="modal-dialog modal-sm modal-dialog-centered">
+                        <div class="modal-content text-center border-0 shadow" style="border-radius: 20px;">
+                            <div class="modal-body p-4">
+                                <div class="mb-3">
+                                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                                </div>
+                                <h5 class="modal-title mb-2" style="color: var(--azul-deep); font-weight: 700;">¡Enviado!</h5>
+                                <p class="text-muted small mb-0">Tu solicitud se envió correctamente. Revisa tu correo para ver tu cédula.</p>
+                                <div class="mt-3">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="text-muted" style="font-size: 0.7rem;">Recargando...</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Sección de éxito eliminada (reemplazada por modal) -->
+                <div id="successNotification" style="display: none;"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -472,8 +479,8 @@ function createMemberRow() {
     const uniqueId = "carrera_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
     tr.innerHTML = `
         <td><input type="text" class="form-control form-control-sm member-nombre" placeholder="Nombre" required></td>
-        <td><input type="text" class="form-control form-control-sm member-matricula" placeholder="Matrícula" required></td>
-        <td><input type="text" class="form-control form-control-sm member-telefono" placeholder="Teléfono" required></td>
+        <td><input type="number" class="form-control form-control-sm member-matricula" placeholder="Matrícula" required></td>
+        <td><input type="number" class="form-control form-control-sm member-telefono" placeholder="Teléfono" required></td>
         <td><input type="email" class="form-control form-control-sm member-correo" placeholder="Correo" required></td>
         <td>
             <div class="input-group input-group-sm">
@@ -482,7 +489,7 @@ function createMemberRow() {
             </div>
         </td>
         <td><input type="text" class="form-control form-control-sm member-nivel" placeholder="Nivel/Grupo" required></td>
-        <td><input type="text" class="form-control form-control-sm member-cuatri" placeholder="Cuatri" required></td>
+        <td><input type="number" class="form-control form-control-sm member-cuatri" placeholder="Cuatri" required></td>
         <td class="text-center">
             <button type="button" class="btn btn-sm btn-outline-danger remove-member-btn">
                 <i class="bi bi-trash"></i>
@@ -620,14 +627,12 @@ form.addEventListener("submit", async function (e) {
         });
 
         if (response.ok) {
-            // Ocultar formulario y mostrar notificación
-            form.style.display = "none";
-            document.querySelector(".card-header").style.display = "none";
-            const successNotif = document.getElementById("successNotification");
-            if (successNotif) {
-                successNotif.style.display = "block";
-                successNotif.scrollIntoView({ behavior: 'smooth' });
-            }
+            const minModal = new bootstrap.Modal(document.getElementById('minimalSuccessModal'));
+            minModal.show();
+            // Recarga automática después de 3 segundos
+            setTimeout(() => {
+                location.reload();
+            }, 3500);
         } else {
             const errData = await response.json();
             showAlert("❌ Error: " + (errData.error || "Ocurrió un problema"), "danger");
