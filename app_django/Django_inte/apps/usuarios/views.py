@@ -604,6 +604,27 @@ def documentacion_view(request):
     contrato_vigente = _obtener_contrato_vigente()
     vigente_id = contrato_vigente.get("_id") if contrato_vigente else None
 
+    # El contrato es a nivel de EQUIPO: se guarda y consulta con el ID del lÃ­der del proyecto,
+    # para que si cualquier integrante lo envÃ­a, todos vean "En revision" y el admin habilite a todos al aceptar.
+    contrato_owner_id = str(usuario_id)
+    try:
+        usuario_obj = db.usuarios.find_one({"_id": ObjectId(str(usuario_id))})
+        correo_usuario = (usuario_obj.get("correo") or "").strip().lower() if usuario_obj else ""
+        proyecto = db.proyectos.find_one({
+            "$or": [
+                {"usuario_id": str(usuario_id)},
+                {"usuario_lider_id": str(usuario_id)},
+                {"resumen.correo": correo_usuario},
+                {"integrantes.correo": correo_usuario},
+            ]
+        }) if correo_usuario else db.proyectos.find_one({
+            "$or": [{"usuario_id": str(usuario_id)}, {"usuario_lider_id": str(usuario_id)}]
+        })
+        if proyecto:
+            contrato_owner_id = str(proyecto.get("usuario_lider_id") or proyecto.get("usuario_id") or usuario_id)
+    except Exception:
+        contrato_owner_id = str(usuario_id)
+
     estado, ultimo_contrato = get_team_contract_status(usuario_id)
     if estado == "Aceptado":
         return redirect("portal_publico")
@@ -612,7 +633,7 @@ def documentacion_view(request):
 
     if request.method == "POST":
         accion = (request.POST.get("accion") or "").strip()
-        ultimo_contrato = _ultimo_contrato_usuario(usuario_id, vigente_id)
+        ultimo_contrato = _ultimo_contrato_usuario(contrato_owner_id, vigente_id)
 
         if not contrato_vigente:
             error = "No hay contrato vigente configurado por administracion."
@@ -646,7 +667,8 @@ def documentacion_view(request):
                 error = "Debes anexar al menos una firma completa."
             else:
                 db.contrato_proyecto.insert_one({
-                    "usuario_id": usuario_id,
+                    "usuario_id": contrato_owner_id,
+                    "enviado_por_usuario_id": str(usuario_id),
                     "nombre_archivo": contrato_editado.name or "contrato_editado",
                     "tipo_archivo": getattr(contrato_editado, "content_type", "application/octet-stream"),
                     "archivo": contrato_editado.read(),
@@ -727,15 +749,34 @@ def ver_contrato_usuario(request, contrato_id):
         return redirect("login")
 
     try:
-        contrato = db.contrato_proyecto.find_one({
-            "_id": ObjectId(contrato_id),
-            "usuario_id": usuario_id
-        })
+        contrato = db.contrato_proyecto.find_one({"_id": ObjectId(contrato_id)})
     except Exception:
         contrato = None
 
     if not contrato or not contrato.get("archivo"):
         raise Http404("Contrato no encontrado")
+
+    # Permitir ver el contrato si pertenece al equipo del usuario (contrato guardado con el ID del lÃ­der).
+    contrato_owner_id = str(contrato.get("usuario_id") or "")
+    if contrato_owner_id != str(usuario_id):
+        try:
+            usuario_obj = db.usuarios.find_one({"_id": ObjectId(str(usuario_id))})
+            correo_usuario = (usuario_obj.get("correo") or "").strip().lower() if usuario_obj else ""
+            proyecto = db.proyectos.find_one({
+                "$or": [
+                    {"usuario_id": str(usuario_id)},
+                    {"usuario_lider_id": str(usuario_id)},
+                    {"resumen.correo": correo_usuario},
+                    {"integrantes.correo": correo_usuario}
+                ]
+            })
+            lider_id = str(proyecto.get("usuario_lider_id") or proyecto.get("usuario_id") or usuario_id) if proyecto else str(usuario_id)
+            if str(lider_id) != contrato_owner_id:
+                raise Http404("Contrato no autorizado")
+        except Http404:
+            raise
+        except Exception:
+            raise Http404("Contrato no autorizado")
 
     tipo = contrato.get("tipo_archivo") or "application/pdf"
     response = HttpResponse(contrato["archivo"], content_type=tipo)
