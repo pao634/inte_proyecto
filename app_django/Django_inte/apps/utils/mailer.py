@@ -5,7 +5,7 @@ from typing import Iterable, Optional
 import logging
 import requests
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives, get_connection
 
 logger = logging.getLogger(__name__)
 
@@ -19,11 +19,14 @@ def _send_via_smtp(
     from_email: Optional[str] = None,
     attachments: Optional[list[dict]] = None,
 ) -> bool:
+    timeout_s = int(os.getenv("EMAIL_TIMEOUT", "10"))
+    connection = get_connection(timeout=timeout_s)
     mensaje = EmailMultiAlternatives(
         subject=subject,
         body=text_body,
         from_email=from_email or settings.DEFAULT_FROM_EMAIL,
         to=list(to),
+        connection=connection,
     )
     if html_body:
         mensaje.attach_alternative(html_body, "text/html")
@@ -83,7 +86,11 @@ def _send_via_sendgrid(
             json=payload,
             timeout=15,
         )
-        return resp.status_code in (200, 202)
+        if resp.status_code in (200, 202):
+            logger.info(f"SendGrid: Correo enviado correctamente a {to}")
+            return True
+        logger.error(f"SendGrid Error ({resp.status_code}): {resp.text}")
+        return False
     except Exception as e:
         logger.error(f"Error crítico en SendGrid API: {str(e)}", exc_info=True)
         return False
@@ -159,13 +166,12 @@ def send_email(
     resend_key = (os.getenv("RESEND_API_KEY") or "").strip()
     sendgrid_key = (os.getenv("SENDGRID_API_KEY") or "").strip()
 
-    # 1. Prioridad: Resend
-    if provider == "resend" or (resend_key and not provider):
-        logger.info("Usando proveedor: Resend API")
-        from_addr = (os.getenv("RESEND_FROM_EMAIL") or from_email or settings.DEFAULT_FROM_EMAIL or "onboarding@resend.dev").strip()
+    allow_smtp = (os.getenv("ALLOW_SMTP_FALLBACK") or "").strip().lower() in ("1", "true", "yes") or bool(getattr(settings, "DEBUG", False))
+
+    def _try_resend() -> bool:
         if not resend_key:
-            logger.error("Error: Se requiere RESEND_API_KEY")
             return False
+        from_addr = (os.getenv("RESEND_FROM_EMAIL") or from_email or settings.DEFAULT_FROM_EMAIL or "onboarding@resend.dev").strip()
         return _send_via_resend(
             subject=subject,
             text_body=text_body,
@@ -176,12 +182,12 @@ def send_email(
             attachments=attachments,
         )
 
-    # 2. Alternativa: SendGrid
-    if provider == "sendgrid" or (sendgrid_key and not provider):
-        logger.info("Usando proveedor: SendGrid API")
+    def _try_sendgrid() -> bool:
+        if not sendgrid_key:
+            return False
         from_addr = (os.getenv("SENDGRID_FROM_EMAIL") or from_email or settings.DEFAULT_FROM_EMAIL or "").strip()
-        if not sendgrid_key or not from_addr:
-            logger.error(f"Error de configuración SendGrid: Faltan llaves (From: {from_addr})")
+        if not from_addr:
+            logger.error("SendGrid: falta SENDGRID_FROM_EMAIL")
             return False
         return _send_via_sendgrid(
             subject=subject,
@@ -193,14 +199,44 @@ def send_email(
             attachments=attachments,
         )
 
-    # 3. Fallback: SMTP
-    logger.info(f"Usando proveedor: SMTP (Host: {settings.EMAIL_HOST})")
-    return _send_via_smtp(
-        subject=subject,
-        text_body=text_body,
-        html_body=html_body,
-        to=to_list,
-        from_email=from_email,
-        attachments=attachments,
-    )
+    def _try_smtp() -> bool:
+        if not allow_smtp:
+            logger.error("SMTP deshabilitado. En Render normalmente SMTP está bloqueado; usa Resend/SendGrid.")
+            return False
+        logger.info(f"Usando proveedor: SMTP (Host: {settings.EMAIL_HOST})")
+        return _send_via_smtp(
+            subject=subject,
+            text_body=text_body,
+            html_body=html_body,
+            to=to_list,
+            from_email=from_email,
+            attachments=attachments,
+        )
 
+    providers_to_try = []
+    if provider:
+        providers_to_try.append(provider)
+        for p in ("resend", "sendgrid", "smtp"):
+            if p not in providers_to_try:
+                providers_to_try.append(p)
+    else:
+        if resend_key:
+            providers_to_try.append("resend")
+        if sendgrid_key:
+            providers_to_try.append("sendgrid")
+        providers_to_try.append("smtp")
+
+    for p in providers_to_try:
+        if p == "resend":
+            logger.info("Intentando proveedor: Resend")
+            if _try_resend():
+                return True
+        elif p == "sendgrid":
+            logger.info("Intentando proveedor: SendGrid")
+            if _try_sendgrid():
+                return True
+        elif p == "smtp":
+            if _try_smtp():
+                return True
+
+    return False
