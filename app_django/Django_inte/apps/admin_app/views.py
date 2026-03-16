@@ -22,7 +22,7 @@ from bson import ObjectId
 from docx2pdf import convert
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
-from django.core.mail import EmailMultiAlternatives
+from apps.utils.mailer import send_email
 
 ADMIN_ROLE_ID = "699eb18f8a2f8c9f2f85cc98"
 try:
@@ -430,35 +430,52 @@ def enviar_correo_estado_solicitud(destinatario, nombre, estado, password=None, 
         </html>
         """
 
-    mensaje = EmailMultiAlternatives(
+    ok = send_email(
         subject=subject,
-        body="Tu solicitud ha sido actualizada.",
+        text_body="Tu solicitud ha sido actualizada.",
+        html_body=html,
+        to=[destinatario],
         from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[destinatario]
     )
-    mensaje.attach_alternative(html, "text/html")
 
-    try:
-        mensaje.send()
+    if ok:
         return True
-    except Exception as e:
-        logger.error(f"Error enviando correo a {destinatario}: {str(e)}")
-        return False
 
-def _background_enviar_correos_bulk(destinatarios_list, estado, password=None, motivo=None):
-    """ Envia correos a múltiples destinatarios. """
+    logger.error(f"No se pudo enviar correo a {destinatario}")
+    return False
+
+def _enviar_correos_bulk(destinatarios_list, estado, password=None, motivo=None):
+    """Envia correos a multiples destinatarios y regresa (ok, fail)."""
+    ok = 0
+    fail = 0
+
     if not destinatarios_list:
-        return
+        return ok, fail
 
-    try:
-        for dest in destinatarios_list:
-            enviar_correo_estado_solicitud(
+    for dest in destinatarios_list:
+        try:
+            sent = enviar_correo_estado_solicitud(
                 destinatario=dest.get("correo"),
                 nombre=dest.get("nombre"),
                 estado=estado,
                 password=password,
-                motivo=motivo
+                motivo=motivo,
             )
+            if sent:
+                ok += 1
+            else:
+                fail += 1
+        except Exception as e:
+            fail += 1
+            logger.error(f"Error enviando correo a {dest.get('correo')}: {str(e)}")
+
+    return ok, fail
+
+
+def _background_enviar_correos_bulk(destinatarios_list, estado, password=None, motivo=None):
+    """ Envia correos a múltiples destinatarios. """
+    try:
+        _enviar_correos_bulk(destinatarios_list, estado, password, motivo)
     except Exception as e:
         logger.error(f"Error en bulk email background: {str(e)}")
 
@@ -497,20 +514,19 @@ def enviar_correo_rechazo_contrato(destinatario, nombre, motivo):
     </html>
     """
     
-    mensaje = EmailMultiAlternatives(
+    ok = send_email(
         subject=subject,
-        body=motivo_txt,
+        text_body=motivo_txt,
+        html_body=html,
+        to=[destinatario],
         from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[destinatario]
     )
-    mensaje.attach_alternative(html, "text/html")
 
-    try:
-        mensaje.send()
+    if ok:
         return True
-    except Exception as e:
-        logger.error(f"Error enviando correo de rechazo contrato a {destinatario}: {str(e)}")
-        return False
+
+    logger.error(f"No se pudo enviar correo de rechazo contrato a {destinatario}")
+    return False
 
 @csrf_exempt
 def actualizar_estado(request, id):
@@ -557,6 +573,10 @@ def actualizar_estado(request, id):
 
     correo = (solicitud.get("correo") or "").strip()
     nombre = (solicitud.get("nombre_completo") or "Emprendedor").strip()
+
+    mail_ok = 0
+    mail_fail = 0
+    mail_enviado = False
 
     if nuevo_estado == "Aceptado":
         if len(password) < 8:
@@ -639,22 +659,20 @@ def actualizar_estado(request, id):
         _asegurar_proyecto_activo(solicitud, usuario_lider_id)
 
         # Enviar correos de aceptación en segundo plano (Bulk)
-        threading.Thread(
-            target=_background_enviar_correos_bulk,
-            args=(destinatarios_bulk, nuevo_estado, password, None)
-        ).start()
+        mail_ok, mail_fail = _enviar_correos_bulk(destinatarios_bulk, nuevo_estado, password, None)
+        mail_enviado = (mail_fail == 0 and mail_ok > 0)
 
     else:
         # Caso Rechazado: Enviar correo informativo en segundo plano
-        threading.Thread(
-            target=enviar_correo_estado_solicitud,
-            args=(correo, nombre, nuevo_estado, None, motivo)
-        ).start()
+        sent = enviar_correo_estado_solicitud(correo, nombre, nuevo_estado, None, motivo)
+        mail_ok = 1 if sent else 0
+        mail_fail = 0 if sent else 1
+        mail_enviado = bool(sent)
 
     # Elimina la solicitud del tablero (aceptada pasa a usuarios, rechazada se descarta).
     db.solicitudes.delete_one({"_id": solicitud["_id"]})
 
-    return JsonResponse({"success": True, "mail_enviado": True})
+    return JsonResponse({"success": True, "mail_enviado": mail_enviado, "mail_ok": mail_ok, "mail_fail": mail_fail})
 
 from django.shortcuts import render
 

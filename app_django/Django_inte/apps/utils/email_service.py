@@ -5,9 +5,9 @@ import threading
 import gridfs
 
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
 
 from config.database.mongo import db
+from apps.utils.mailer import send_email
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -165,22 +165,24 @@ def enviar_correo(destinatario, datos):
     </html>
     """
 
-    mensaje = EmailMultiAlternatives(
+    ok = send_email(
         subject="Confirmacion de solicitud - Incubadora de Empresas",
-        body="Recibimos tu solicitud. Revisa el documento adjunto.",
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[destinatario]
+        text_body="Recibimos tu solicitud. Revisa el documento adjunto.",
+        html_body=html,
+        to=[destinatario],
+        attachments=[{
+            "filename": "Cedula_Inscripcion.pdf",
+            "content_bytes": pdf_content,
+            "mime_type": "application/pdf",
+        }],
     )
-    mensaje.attach_alternative(html, "text/html")
-    mensaje.attach("Cedula_Inscripcion.pdf", pdf_content, "application/pdf")
 
-    try:
-        mensaje.send()
+    if ok:
         print(f"Correo enviado a {destinatario}")
         return True
-    except Exception as e:
-        print(f"Error enviando correo: {e}")
-        return False
+
+    print(f"Error enviando correo a {destinatario}")
+    return False
 
 def enviar_correo_async(destinatario, datos):
     thread = threading.Thread(target=enviar_correo, args=(destinatario, datos))
@@ -240,13 +242,12 @@ def _enviar_correo_individual_contrato(destinatario, nombre, estado, motivo=None
     </div>
     """
     
-    mensaje = EmailMultiAlternatives(subject=sub, body=msg, from_email=settings.DEFAULT_FROM_EMAIL, to=[destinatario])
-    mensaje.attach_alternative(html, "text/html")
-    try:
-        mensaje.send()
-        return True
-    except:
-        return False
+    return send_email(
+        subject=sub,
+        text_body=msg,
+        html_body=html,
+        to=[destinatario],
+    )
 
 def enviar_certificado_finalizacion(destinatario, nombre, proyecto_nombre, archivo_bin, nombre_archivo="Certificado.pdf"):
     sub = f"🎓 ¡Felicidades! Proyecto Finalizado - {proyecto_nombre}"
@@ -257,8 +258,17 @@ def enviar_certificado_finalizacion(destinatario, nombre, proyecto_nombre, archi
         <p>Adjuntamos tu certificado oficial.</p>
     </div>
     """
-    mensaje = EmailMultiAlternatives(subject=sub, body=sub, from_email=settings.DEFAULT_FROM_EMAIL, to=[destinatario])
-    mensaje.attach_alternative(html, "text/html")
+    return send_email(
+        subject=sub,
+        text_body=sub,
+        html_body=html,
+        to=[destinatario],
+        attachments=[{
+            "filename": nombre_archivo,
+            "content_bytes": archivo_bin,
+            "mime_type": "application/pdf",
+        }],
+    )
     if archivo_bin:
         mensaje.attach(nombre_archivo, archivo_bin, "application/pdf")
     try:
