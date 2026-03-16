@@ -85,7 +85,7 @@ def _send_via_sendgrid(
         )
         return resp.status_code in (200, 202)
     except Exception as e:
-        print(f"[Mailer] SendGrid Error: {str(e)}")
+        logger.error(f"Error crítico en SendGrid API: {str(e)}", exc_info=True)
         return False
 
 
