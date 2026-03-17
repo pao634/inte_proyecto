@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="{% static 'css/ver_convocatorias.css' %}?v=18">
 
 <style>
-/* Filter Tabs Styling */
+
 .filter-container {
     display: flex;
     justify-content: center;
@@ -14,33 +14,55 @@
     border-bottom: 1px solid #e2e8f0;
 }
 
+
 .filter-btn {
+    font-family: system-ui, -apple-system, sans-serif; 
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #64748b;
     padding: 10px 18px;
     border-radius: 8px;
     background: white;
     border: 1px solid #e2e8f0;
-    color: #64748b;
-    font-weight: 700;
-    font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.2s;
-    display: flex;
+    display: inline-flex; 
     align-items: center;
+    justify-content: center;
     gap: 8px;
+    text-decoration: none; 
+    line-height: normal;
 }
 
-.filter-btn:hover { background: #f8fafc; color: #1e293b; }
+.filter-btn:hover { 
+    background: #f8fafc; 
+    color: #1e293b; 
+}
+
+
 .filter-btn.active {
     background: #1a1a1a;
     color: white;
     border-color: #1a1a1a;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
+.btn-regresar i {
+    color: #001f3f;
+    font-weight: bold;
+}
+
+
 </style>
 
 <div class="muro-container">
     <!-- Filter Tabs -->
     <div class="filter-container">
+
+        <a href="{% url 'portal_visitante' %}" class="filter-btn btn-regresar">
+            <i class="bi bi-arrow-left"></i> Regresar
+        </a>
+        
         <button class="filter-btn active" onclick="filterMuro('all', this)">
             <i class="bi bi-grid-fill"></i> Todas
         </button>
